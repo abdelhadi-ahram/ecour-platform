@@ -13,14 +13,6 @@ class Module(models.Model):
 		return "%s %s" %(self.name, self.department.name)
 
 
-class Teaching(models.Model):
-	teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
-	module = models.ForeignKey(Module, on_delete=models.CASCADE)
-
-	def __str__(self):
-		return "%s teaches %s" %(self.teacher, self.module)
-
-
 class Element(models.Model):
 	module = models.ForeignKey(Module, on_delete=models.CASCADE)
 	name = models.CharField(max_length=150, unique=True)
@@ -28,6 +20,15 @@ class Element(models.Model):
 
 	def __str__(self):
 		return self.name+ " " + self.module.name
+
+		
+class Teaching(models.Model):
+	teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
+	element = models.ForeignKey(Element, on_delete=models.CASCADE)
+
+	def __str__(self):
+		return "%s teaches %s" %(self.teacher, self.element.name)
+
 
 
 
