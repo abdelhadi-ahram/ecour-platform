@@ -5,13 +5,14 @@ from graphql import GraphQLError
 
 from graphene_django import DjangoObjectType
 
-from department.mutations import AddLectureText
+from department.mutations import AddLectureText, AddLectureFile, UpdateLecture, AddSection
+from department.queries import TeacherQueries
 
 
 
 class UserType(DjangoObjectType):
     class Meta:
-        model = User 
+        model = User
         fields = ("first_name", "cin")
 
     role = graphene.String()
@@ -26,7 +27,7 @@ class UserType(DjangoObjectType):
 
 
 
-class Query(graphene.ObjectType):
+class Query(TeacherQueries, graphene.ObjectType):
     authenticate_user = graphene.Field(UserType, email=graphene.String(), password=graphene.String())
     get_logged_user = graphene.String()
 
@@ -47,8 +48,8 @@ class Query(graphene.ObjectType):
 
 class Mutations(graphene.ObjectType):
     add_lecture_text = AddLectureText.Field()
-
+    add_lecture_file = AddLectureFile.Field()
+    update_lecture = UpdateLecture.Field()
+    add_section = AddSection.Field()
 
 schema = graphene.Schema(query=Query, mutation=Mutations)
-
-
