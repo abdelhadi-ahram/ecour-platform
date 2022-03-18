@@ -34,7 +34,7 @@ class Teaching(models.Model):
 
 
 class Section(models.Model):
-	element = models.ForeignKey(Element, on_delete=models.CASCADE)
+	element = models.ForeignKey(Element, related_name="sections", on_delete=models.CASCADE)
 	name = models.CharField(max_length=150)
 	created_at = models.DateTimeField(auto_now=True)
 
@@ -45,7 +45,7 @@ class Section(models.Model):
 
 
 class Lecture(models.Model):
-	section = models.ForeignKey(Section, on_delete=models.CASCADE)
+	section = models.ForeignKey(Section, related_name="lectures", on_delete=models.CASCADE)
 	title = models.CharField(max_length=150)
 	type = models.CharField(max_length=50)
 	content = models.TextField(null=True)

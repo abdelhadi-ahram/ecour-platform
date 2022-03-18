@@ -22,20 +22,20 @@ class TeachingType(DjangoObjectType):
 class DepartmentType(DjangoObjectType):
 	class Meta:
 		model = Department
-		fields = ("id", "name", "teachings")
+		fields = ("id", "name")
 
 class TeacherQueries(graphene.ObjectType):
-    get_departments = graphene.List(TeachingType)
+	get_teachings = graphene.List(TeachingType)
 	department = graphene.Field(DepartmentType)
-	
-    def resolve_get_departments(self, info):
-        user = info.context.user
-        if user.is_authenticated:
-            try:
-                teacher = Teacher.objects.get(user=user)
-                teachings = Teaching.objects.filter(teacher=teacher)
-                return teachings
-            except:
-                raise GraphQLError(makeJson("PERMISSION", "You don't have the right to perform this action"))
-        else :
-            raise GraphQLError(makeJson("PERMISSION", "You are not logged in"))
+
+	def resolve_get_teachings(self, info):
+		user = info.context.user
+		if user.is_authenticated:
+			try:
+				teacher = Teacher.objects.get(user=user)
+				teachings = Teaching.objects.filter(teacher=teacher)
+				return teachings
+			except:
+				raise GraphQLError(makeJson("PERMISSION", "You don't have the right to perform this action"))
+			else :
+				raise GraphQLError(makeJson("PERMISSION", "You are not logged in"))
