@@ -13,15 +13,15 @@ export default function Teacher() {
     <div className="w-screen h-screen bg-[#f5f6f8] font-nunito flex">
         <div className="h-screen flex flex-col items-center justify-center px-6 py-8">
           <Sidebar>
-          <Buttons />
+            <Buttons />
           </Sidebar>
         </div>
-         <div className="w-full h-screen">
-         <RightPanel >
-              <Department />
-         </RightPanel>
 
-      </div>
+         <div className="w-full h-screen">
+           <RightPanel >
+                <Department />
+           </RightPanel>
+         </div>
 
       </div>
   )
