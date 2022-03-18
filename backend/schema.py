@@ -5,8 +5,8 @@ from graphql import GraphQLError
 
 from graphene_django import DjangoObjectType
 
-from department.mutations import AddLectureText, AddLectureFile, UpdateLecture, AddSection
-from department.queries import TeacherQueries
+from department.teacher_mutations import AddLectureText, AddLectureFile, UpdateLecture, AddSection
+from department.teacher_queries import TeacherQueries
 
 
 

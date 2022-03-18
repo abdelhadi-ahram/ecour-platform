@@ -52,6 +52,8 @@ class TeacherQueries(graphene.ObjectType):
 	lecture = graphene.Field(LectureType)
 	module = graphene.Field(ModuleType)
 
+	get_lecture_by_id = graphene.Field(LectureType, lecture_id=graphene.ID())
+
 	def resolve_get_teachings(self, info):
 		user = info.context.user
 		if user.is_authenticated:
@@ -64,8 +66,26 @@ class TeacherQueries(graphene.ObjectType):
 			else :
 				raise GraphQLError(makeJson("PERMISSION", "You are not logged in"))
 
+
 	#get lectures that belong to a teaching model
 	def resolve_get_element_lectures(self, info, teaching_id):
+		user = info.context.user
+		if user.is_authenticated:
+			try:
+				teacher = Teacher.objects.get(user=user)
+				teaching = Teaching.objects.get(pk=teaching_id, teacher=teacher)
+				return teaching.element
+			except Teacher.DoesNotExist:
+				raise GraphQLError(makeJson("PERMISSION", "You don't have the permission to see this content"))
+			except Teaching.DoesNotExist:
+				raise GraphQLError(makeJson("DATAERROR", "The provided data is not valid"))
+			except :
+				raise GraphQLError(makeJson("DATAERROR", "Could not perform the last operation"))
+		else :
+			raise GraphQLError(makeJson("LOGIN", "You are not logged in"))
+
+
+	def resolve_get_lecture_by_id(self, info, lecture_id):
 		user = info.context.user
 		if user.is_authenticated:
 			try:

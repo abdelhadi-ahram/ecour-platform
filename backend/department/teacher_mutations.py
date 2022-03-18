@@ -13,7 +13,7 @@ def getFileType(file):
 		return "image"
 	elif file.endswith((".mp4",)):
 		return "video"
-	elif file/endswith('.pdf'):
+	elif file.endswith('.pdf'):
 		return "pdf"
 	return "document"
 
@@ -36,7 +36,6 @@ class AddLectureFile(graphene.Mutation):
 
 	success = graphene.Boolean()
 
-	@classmethod
 	def mutate(self, info, title, description, file, sec):
 		user = info.context.user
 		if user.is_authenticated:
@@ -49,7 +48,8 @@ class AddLectureFile(graphene.Mutation):
 				teacher = Teacher.objects.get(user=user)
 				is_valid = Teaching.objects.get(teacher=teacher, element=element)
 				if is_valid is not None:
-					lecture = Lecture(section=section, title=title, content=description, type=getFileType(file), file=file)
+					lecture = Lecture(section=section, title=title, content=description, type="", file=file)
+					lecture.type = getFileType(lecture.file.name)
 					lecture.save()
 					return AddLectureFile(success=True)
 			except:
