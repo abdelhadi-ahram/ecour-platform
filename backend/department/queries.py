@@ -4,6 +4,7 @@ from authentication.models import Department, Teacher
 from department.models import Teaching
 
 from graphql import GraphQLError
+import json
 
 def makeJson(type, text):
 	response = {
@@ -18,16 +19,21 @@ class TeachingType(DjangoObjectType):
         fields = ("id", "department")
 
     # is_responsible = graphene.String()
+class DepartmentType(DjangoObjectType):
+	class Meta:
+		model = Department
+		fields = ("id", "name", "teachings")
 
 class TeacherQueries(graphene.ObjectType):
     get_departments = graphene.List(TeachingType)
-
+	department = graphene.Field(DepartmentType)
+	
     def resolve_get_departments(self, info):
         user = info.context.user
         if user.is_authenticated:
             try:
                 teacher = Teacher.objects.get(user=user)
-                teachings = Teaching.objects.select_related("department").filter(teacher=teacher)
+                teachings = Teaching.objects.filter(teacher=teacher)
                 return teachings
             except:
                 raise GraphQLError(makeJson("PERMISSION", "You don't have the right to perform this action"))

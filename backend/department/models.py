@@ -25,7 +25,7 @@ class Element(models.Model):
 class Teaching(models.Model):
 	teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
 	element = models.ForeignKey(Element, on_delete=models.CASCADE)
-	department = models.ForeignKey(Department, on_delete=models.CASCADE)
+	department = models.ForeignKey(Department, related_name="teachings", on_delete=models.CASCADE)
 
 	def __str__(self):
 		return "%s teaches %s" %(self.teacher, self.element.name)
