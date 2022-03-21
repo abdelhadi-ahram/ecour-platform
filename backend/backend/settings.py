@@ -35,6 +35,7 @@ ALLOWED_HOSTS = ["192.168.43.15", "127.0.0.1"]
 # Application definition
 
 INSTALLED_APPS = [
+    'sslserver',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -153,5 +154,4 @@ CORS_ALLOW_METHODS = [
 SESSION_COOKIE_SAMESITE = 'None'
 SESSION_COOKIE_SECURE = True
 
-# CSRF_COOKIE_DOMAIN = "http://localhost:3000"
 # SESSION_COOKIE_DOMAIN = "http://localhost:3000"

@@ -5,7 +5,7 @@ from graphql import GraphQLError
 
 from graphene_django import DjangoObjectType
 
-from department.teacher_mutations import AddLectureText, AddLectureFile, UpdateLecture, AddSection
+from department.teacher_mutations import AddLectureText, AddLectureFile, UpdateLecture, AddSection, DeleteLecture
 from department.teacher_queries import TeacherQueries
 
 
@@ -39,10 +39,9 @@ class Query(TeacherQueries, graphene.ObjectType):
         raise GraphQLError("Email or password are incorrect pleaze try again")
 
     def resolve_get_logged_user(self, info):
-        #if info.context.user.is_authenticated:
-            #return info.context.user.get_full_name()
-        #raise GraphQLError("You must be logged in to see this content")
-        return "Hello joe"
+        if info.context.user.is_authenticated:
+            return info.context.user.get_full_name()
+        raise GraphQLError("You are not logged in")
 
 
 
@@ -51,5 +50,6 @@ class Mutations(graphene.ObjectType):
     add_lecture_file = AddLectureFile.Field()
     update_lecture = UpdateLecture.Field()
     add_section = AddSection.Field()
+    delete_lecture = DeleteLecture.Field()
 
 schema = graphene.Schema(query=Query, mutation=Mutations)

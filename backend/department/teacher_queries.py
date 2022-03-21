@@ -32,12 +32,12 @@ class LectureType(DjangoObjectType):
 class SectionType(DjangoObjectType):
 	class Meta:
 		model = Section
-		fields = ("element", "name", "lectures")
+		fields = ("id", "element", "name", "lectures")
 
 class ElementType(DjangoObjectType):
 	class Meta:
 		model = Element
-		fields = ("module","name","sections")
+		fields = ("id", "module","name","sections")
 
 class ModuleType(DjangoObjectType):
 	class Meta:

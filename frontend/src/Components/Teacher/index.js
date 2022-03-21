@@ -26,7 +26,3 @@ export default function Teacher() {
       </div>
   )
 }
-ReactDOM.render(
-  <Teacher />,
-  document.querySelector('#root')
-)

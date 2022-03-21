@@ -28,7 +28,7 @@ export default function RightPannel(props){
 
        <div className="py-3 px-2 flex space-x-3 grow overflow-y-hidden">
 
-            <div className="w-3/4 shrink overflow-y-scroll">
+            <div className="w-3/4 shrink overflow-y-auto">
                   {props.children}
             </div>
 

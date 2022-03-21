@@ -65,3 +65,20 @@ export const EVENTS = [
     ]
   }
 ]
+
+
+
+export const DEPARTMENT = [
+  {
+    "name" : "GI",
+    "id" : 1,
+  },
+  {
+    "name" : "TCC",
+    "id" : 2,
+  },
+  {
+    "name" : "GBI",
+    "id" : 3,
+  }
+]

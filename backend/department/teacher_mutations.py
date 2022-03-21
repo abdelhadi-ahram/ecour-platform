@@ -132,6 +132,37 @@ class UpdateLecture(graphene.Mutation):
 				raise GraphQLError(makeJson("PERMISSION","You don't have the right to perform this action"))
 
 
+
+class DeleteLecture(graphene.Mutation):
+	class Arguments:
+		lecture_id = graphene.ID()
+
+	ok = graphene.Boolean()
+
+	def mutate(self, info, lecture_id):
+		user = info.context.user
+		if user.is_authenticated:
+			try:
+				teacher = Teacher.objects.get(user=user)
+				lecture = Lecture.objects.get(id=lecture_id)
+				if Teaching.objects.filter(teacher=teacher, element=lecture.section.element).exists():
+					lecture.delete()
+					return AddSection(ok=True)
+				else:
+					raise GraphQLError(makeJson("PERMISSION", "You do not have the right to perform this action"))
+			except Teacher.DoesNotExist:
+				raise GraphQLError(makeJson("PERMISSION", "You do not have the right to perform this action"))
+			except Lecture.DoesNotExist:
+				raise GraphQLError(makeJson("DATAERROR", "The provided data is nt valid"))
+			except Teaching.DoesNotExist:
+				raise GraphQLError(makeJson("PERMISSION", "Only teachers are allowed to perform this action"))
+			except Exception as e:
+				raise GraphQLError(e)
+		else:
+			raise GraphQLError(makJson("LOGIN", "You are not logged in"))
+
+
+
 class AddSection(graphene.Mutation):
 	class Arguments:
 		element_id = graphene.ID()
