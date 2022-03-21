@@ -1,6 +1,7 @@
 import SelectSection from "./SelectSection"
 import SelectType from "./SelectType"
 import AddLectureText from "./AddLectureText"
+import AddLectureFile from "./AddLectureFile"
 
 
 import {
@@ -17,6 +18,7 @@ export function AddLecture(){
       <Route path="/select-section" element={<SelectSection />} />
       <Route path="/select-type/:sectionId" element={<SelectType />} />
       <Route path="/add-lecture-text/:sectionId" element={<AddLectureText />} />
+      <Route path="/add-lecture-file/:sectionId" element={<AddLectureFile />} />
     </Routes>
   )
 }

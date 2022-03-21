@@ -23,6 +23,14 @@ const client = new ApolloClient({
   link
 });
 
+window.addEventListener("dragover",function(e){
+  e.preventDefault();
+},false);
+
+window.addEventListener("drop",function(e){
+  e.preventDefault();
+},false);
+
 ReactDOM.render(
   <BrowserRouter>
     <ApolloProvider client={client}>

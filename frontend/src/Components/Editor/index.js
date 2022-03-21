@@ -58,22 +58,11 @@ const TextEditor = ({ value, setValue }) => {
   }
 
   return(
-    <div className="flex flex-col justify-center items-center my-8">
-      <div className="md:w-3/4 mx-4">
+    <div className="flex flex-col justify-center my-2">
+      <div className="">
         <Slate editor={editor} value={value} onChange={setValue} >
 
-          <div className="flex justify-center items-center rounded border border-gray-200 space-x-2">
-            {MARK_BUTTONS.map(item =>{
-              return <MarkButton format={item.format} icon={item.icon} />
-            })}
-            {BLOCK_BUTTONS.map(item =>{
-              return <BlockButton format={item.format} icon={item.icon}  />
-            })}
-            <ColorPicker />
-            <button className="font-bold text-gray-400" onMouseDown={() => {toggleBlock(editor,"block-code")}}>{"{ }"}</button>
-          </div>
-
-          <div className="border boredr-gray-200 mt-4 p-2">
+          <div className="border boredr-gray-200 p-2 h-[200px]">
             <Editable
               renderLeaf={renderLeaf}
               placeholder="Type some text.."
@@ -100,6 +89,18 @@ const TextEditor = ({ value, setValue }) => {
               }}
             />
           </div>
+
+          <div className="flex justify-center items-center rounded border border-gray-200 my-2 space-x-2">
+            {MARK_BUTTONS.map(item =>{
+              return <MarkButton format={item.format} icon={item.icon} />
+            })}
+            {BLOCK_BUTTONS.map(item =>{
+              return <BlockButton format={item.format} icon={item.icon}  />
+            })}
+            <ColorPicker />
+            <button className="font-bold text-gray-400" onMouseDown={() => {toggleBlock(editor,"block-code")}}>{"{ }"}</button>
+          </div>
+
         </Slate>
       </div>
     </div>

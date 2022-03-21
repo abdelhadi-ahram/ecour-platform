@@ -8,7 +8,7 @@ import {
   gql
 } from "@apollo/client"
 
-import {Link } from "react-router-dom"
+import {Link, useNavigate} from "react-router-dom"
 
 const GET_LECTURES_SECTIONS = gql`
   query GetElementSection($teachingId : ID!){
@@ -28,9 +28,15 @@ function SelectSection(){
 
   const [showAdd, setShowAdd] = React.useState(false)
 
+  const navigate = useNavigate()
+
+  function cancelClicked(){
+    navigate("/my")
+  }
+
   return(
     <div className="fixed inset-0 z-20 flex flex-col items-center justify-center">
-      <div className="bg-black opacity-20 fixed inset-0  z-0"></div>
+      <div className="bg-black opacity-20 fixed inset-0  z-0" onClick={cancelClicked}></div>
       <div className="w-[400px] p-6 rounded-xl bg-white z-10 flex flex-col items-center justify-center space-y-1">
         <div className="w-full flex flex-col space-y-2">
           <div className="flex justify-between items-center">

@@ -107,14 +107,14 @@ function Departments(){
             </Link>
           </div>
 
-  				<div className="flex flex-col space-y-8">
-
+          <div>          
             <SelectedDepartment.Provider value={selectedDepartment}>
               <AddLecture />
-              <Lectures />
+      				<div className="flex flex-col space-y-8">
+                  <Lectures />
+      				</div>
             </SelectedDepartment.Provider>
-
-  				</div>
+          </div>
   			</div>
 		</div>
 	)
