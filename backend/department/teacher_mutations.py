@@ -61,12 +61,12 @@ class AddLectureFile(graphene.Mutation):
 class AddLectureText(graphene.Mutation):
 	class Arguments:
 		title = graphene.String(required=True)
-		description = graphene.String(required=True)
+		content = graphene.String(required=True)
 		section_id = graphene.ID()
 
 	ok = graphene.Boolean()
 
-	def mutate(self, info, title, description, section_id):
+	def mutate(self, info, title, content, section_id):
 		user = info.context.user
 		if user.is_authenticated:
 			try:
@@ -77,7 +77,7 @@ class AddLectureText(graphene.Mutation):
 			try:
 				teacher = Teacher.objects.get(user=user)
 				is_valid = Teaching.objects.get(teacher=teacher, element=section.element)
-				lecture = Lecture(section=section, title=title, content=description, type="text")
+				lecture = Lecture(section=section, title=title, content=content, type="text")
 				lecture.save()
 				return AddLectureText(ok=True)
 
@@ -111,27 +111,27 @@ class UpdateLecture(graphene.Mutation):
 				lecture = Lecture.objects.get(pk=id)
 				teacher = Teacher.objects.get(user=user)
 				is_valid = Teaching.objects.get(teacher=teacher, element=lecture.section.element)
-				if is_valid:
-					pass
-				# 	if title:
-				# 		lecture.title = title
-				# 	if description:
-				# 		lecture.content = description
-				# 	if file:
-				# 		lecture.type = getFileType(file)
-				# 		lecture.file = file
-				# 	if section_id:
-				# 		section = Section.objects.get(pk=section_id)
-				# 		lecture.section = section
-				#	lecture.save()
-					return UpdateLecture(ok=True)
-				else :
-					raise Exception(makeJson("PERMISSION", "You are not allowed to perform this action"))
+				if title:
+					lecture.title = title
+				if description:
+					lecture.content = description
+				if file:
+					lecture.file = file
+					lecture.type = getFileType(lecture.file.name)
+				if section_id:
+					section = Section.objects.get(pk=section_id)
+					lecture.section = section
+				lecture.save()
+				return UpdateLecture(ok=True)
+
 			except Lecture.DoesNotExist:
 				raise GraphQLError(makeJson("DATAERROR","The provided lecture is not valid"))
 			except Teaching.DoesNotExist:
 				raise GraphQLError(makeJson("PERMISSION","You don't have the right to perform this action"))
-
+			except :
+				raise GraphQLError(makeJson("PERMISSION","You don't have the right to perform this action"))
+		else:
+			raise GraphQLError(makeJson("LOGIN","You are nt logged in"))
 
 
 class DeleteLecture(graphene.Mutation):

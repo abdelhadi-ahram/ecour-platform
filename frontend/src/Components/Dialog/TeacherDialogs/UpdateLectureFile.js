@@ -20,8 +20,8 @@ const GET_LECTURE = gql`
 
 
 const UPDATE_LECTURE_FILE = gql`
-  mutation UpdateLectureFile($id:ID!, $title: String!){
-    updateLecture(id:$id, title:$title){
+  mutation UpdateLectureFile($lectureId:ID!, $title: String!, $file: Upload!){
+    updateLecture(id:$lectureId, title:$title, file:$file){
       ok
     }
   }
@@ -67,9 +67,8 @@ function UpdateLectureFile(){
   }
 
   function postData(){
-    if(title && file){
-      const res = updateLectureFile({variables : {lectureId, title}})
-      console.log(res)
+    if(file || title){
+      updateLectureFile({variables : {lectureId, title, file}})
       navigate("/my")
     }
   }
@@ -124,7 +123,7 @@ function UpdateLectureFile(){
 
             <div className="flex items-center justify-end">
               <button onClick={cancelClicked} className="px-4 py-[6px] text-gray-500 bg-gray-100 rounded-md mx-3 text-md hover:bg-gray-200 hover:text-gray-600">Cancel</button>
-              <button disabled={!(title && file)} onClick={postData} className="px-4 py-[6px] text-white bg-blue-400 disabled:bg-blue-300 font-bold rounded-md text-md shadow border border-white focus:ring-1 focus:ring-blue-400 hover:shadow-lg">Post</button>
+              <button disabled={!(title || file)} onClick={postData} className="px-4 py-[6px] text-white bg-blue-400 disabled:bg-blue-300 font-bold rounded-md text-md shadow border border-white focus:ring-1 focus:ring-blue-400 hover:shadow-lg">Post</button>
             </div>
         </div>
       </div>

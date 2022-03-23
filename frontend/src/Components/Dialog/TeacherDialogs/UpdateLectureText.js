@@ -3,29 +3,41 @@ import {useParams, useNavigate} from "react-router-dom"
 import React from "react"
 
 import {
+  useQuery,
   useMutation,
   gql
 } from "@apollo/client";
 
 import TextEditor from "../../Editor";
 
-const ADD_LECTURE_TEXT = gql`
-  mutation addLectureText($title: String!, $content: String!, $sectionId : ID!){
-    addLectureText(title: $title, content: $content, sectionId: $sectionId){
+const UPDATE_LECTURE_TEXT = gql`
+  mutation UpdateLectureText($lectureId:ID!, $title: String!, $content: String!){
+    addLectureText(id: $lectureId, title: $title, content: $content){
       ok
     }
   }
 `;
 
+const GET_LECTURE = gql`
+  query GetLectureById($lectureId : ID!){
+    getLectureById(lectureId : $lectureId){
+      title
+      content
+    }
+  }
+`;
 
-function AddLectureText(){
-  const {sectionId} = useParams()
+
+function UpdateLectureText(){
+  const {lectureId} = useParams()
   const navigate = useNavigate()
 
   const [input, setInput] = React.useState(initialValue);
   const [title, setTitle] = React.useState("");
 
-  const [addLecture, {data, loading, error}] = useMutation(ADD_LECTURE_TEXT)
+  const {data, error, loading} = useQuery(GET_LECTURE, {variables : {lectureId}})
+
+  const [updateLecture, updateLectureResponse] = useMutation(UPDATE_LECTURE_TEXT)
 
   function cancelClicked(){
     navigate("/my")
@@ -33,9 +45,14 @@ function AddLectureText(){
 
   function postData(){
     var content = JSON.stringify(input)
-    addLecture({variables : {title, content, sectionId}})
+    updateLecture({variables : {lectureId, title, content}})
     navigate("/my")
   }
+
+  React.useEffect(() => {
+      setTitle(data?.getLectureById?.title || "")
+      setInput(JSON.parse(data?.getLectureById?.content || initialValue))
+  }, [data])
 
   return (
     <div className="fixed inset-0 z-20 flex flex-col items-center justify-center">
@@ -62,7 +79,6 @@ function AddLectureText(){
   )
 }
 
-
 const initialValue = [
   {
     type: "paragraph",
@@ -72,5 +88,5 @@ const initialValue = [
   }
 ]
 
-export default AddLectureText;
+export default UpdateLectureText;
 
