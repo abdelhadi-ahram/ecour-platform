@@ -4,36 +4,49 @@ import React from "react"
 import DragAndDrop from "../../DragFile"
 
 import {
+  useQuery,
   useMutation,
   gql
 } from "@apollo/client";
 
 
-const ADD_LECTURE_FILE = gql`
-  mutation AddLectureFile($title: String!, $file: Upload!, $sectionId : ID!){
-    addLectureFile(title:$title, file:$file, sectionId : $sectionId){
+const GET_LECTURE = gql`
+  query GetLectureById($lectureId : ID!){
+    getLectureById(lectureId : $lectureId){
+      title
+    }
+  }
+`;
+
+
+const UPDATE_LECTURE_FILE = gql`
+  mutation UpdateLectureFile($id:ID!, $title: String!){
+    updateLecture(id:$id, title:$title){
       ok
     }
   }
 `;
 
 
-
-
-function AddLectureFile(){
-  const {sectionId} = useParams()
+function UpdateLectureFile(){
+  const {lectureId} = useParams()
   const navigate = useNavigate()
 
   const [drag, setDrag] = React.useState(false)
   const [title, setTitle] = React.useState("")
   const [file, setFile] = React.useState(null)
 
-  const [addLectureFile, {data, loading, error}] = useMutation(ADD_LECTURE_FILE,
+  const {data, error, loading} = useQuery(GET_LECTURE, {variables : {lectureId}})
+
+  const [updateLectureFile, updateLectureResponse] = useMutation(UPDATE_LECTURE_FILE,
    {refetchQueries : [
          "GetElementLectures"
        ]
     })
 
+  if(updateLectureResponse.error){
+    console.log(JSON.stringify(updateLectureResponse.error))
+  }
 
   function cancelClicked(){
     navigate("/my")
@@ -55,20 +68,25 @@ function AddLectureFile(){
 
   function postData(){
     if(title && file){
-      addLectureFile({variables : {title, file, sectionId}})
+      const res = updateLectureFile({variables : {lectureId, title}})
+      console.log(res)
       navigate("/my")
     }
   }
+
+  React.useEffect(() => {
+      setTitle(data?.getLectureById?.title || "")
+  }, [data])
 
   return (
     <div className="fixed inset-0 z-20 flex flex-col items-center justify-center">
       <div className="bg-black opacity-20 fixed inset-0  z-0"></div>
       <div className="w-[400px] p-6 rounded-xl bg-white z-10 flex flex-col items-center justify-center space-y-1">
         <div className="w-full flex flex-col space-y-4">
-            {error && <p className="w-full p-2 rounded-lg bg-red-50 text-red-500">An error has been occurred, please try again</p>}
+            {updateLectureResponse.error && <p className="w-full p-2 rounded-lg bg-red-50 text-red-500">An error has been occurred, please try again</p>}
             <div className="flex flex-col space-y-1">
               <p className="text-gray-600 font-semibold">Title</p>
-              <input value={title} onChange={e => setTitle(e.target.value)} className="w-full rounded border border-gray-200 px-2 py-1 focus:outline-none hover:border-gray-300" />
+              <input value={title} onChange={e => setTitle(e.target.value)} className="w-full rounded text-gray-700 border border-gray-200 px-2 py-1 focus:outline-none hover:border-gray-300" />
             </div>
 
             <div className="flex flex-col space-y-1">
@@ -116,5 +134,5 @@ function AddLectureFile(){
 
 
 
-export default AddLectureFile;
+export default UpdateLectureFile;
 

@@ -2,7 +2,7 @@ import SelectSection from "./SelectSection"
 import SelectType from "./SelectType"
 import AddLectureText from "./AddLectureText"
 import AddLectureFile from "./AddLectureFile"
-
+import UpdateLectureFile from "./UpdateLectureFile"
 
 import {
   Routes, Route, Navigate
@@ -19,6 +19,7 @@ export function AddLecture(){
       <Route path="/select-type/:sectionId" element={<SelectType />} />
       <Route path="/add-lecture-text/:sectionId" element={<AddLectureText />} />
       <Route path="/add-lecture-file/:sectionId" element={<AddLectureFile />} />
+      <Route path="/update-lecture-file/:lectureId" element={<UpdateLectureFile />} />
     </Routes>
   )
 }

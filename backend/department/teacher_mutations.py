@@ -30,32 +30,32 @@ def makeJson(type, text):
 class AddLectureFile(graphene.Mutation):
 	class Arguments:
 		title = graphene.String(required=True)
-		description = graphene.String(required=False)
 		file = Upload(required=True)
-		sec = graphene.ID()
+		section_id = graphene.ID()
 
-	success = graphene.Boolean()
+	ok = graphene.Boolean()
 
-	def mutate(self, info, title, description, file, sec):
+	def mutate(self, info, title, file, section_id):
 		user = info.context.user
 		if user.is_authenticated:
 			try:
-				section = Section.objects.get(pk=sec)
-			except:
-				raise GraphQLError(makeJson("DATAERROR", "The given section is not valid"))
-
-			try:
+				section = Section.objects.get(pk=section_id)
 				teacher = Teacher.objects.get(user=user)
-				is_valid = Teaching.objects.get(teacher=teacher, element=element)
-				if is_valid is not None:
-					lecture = Lecture(section=section, title=title, content=description, type="", file=file)
-					lecture.type = getFileType(lecture.file.name)
-					lecture.save()
-					return AddLectureFile(success=True)
-			except:
+				is_valid = Teaching.objects.get(teacher=teacher, element=section.element)
+				lecture = Lecture(section=section, title=title, content="", type="", file=file)
+
+				lecture.type = getFileType(lecture.file.name)
+				lecture.save()
+				return AddLectureFile(ok=True)
+			except Section.DoesNotExist:
+				raise GraphQLError(makeJson("DATAERROR","The given section is not valid"))
+			except Teacher.DoesNotExist:
+				raise GraphQLError(makeJson("PERMISSION","You do do not have the permission"))
+			except Teaching.DoesNotExist:
 				raise GraphQLError(makeJson("PERMISSION","You don't have the right to perform this action"))
 
-		raise GraphQLError(makeJson("LOGIN","You are nt logged in"))
+		else:
+			raise GraphQLError(makeJson("LOGIN","You are nt logged in"))
 
 
 class AddLectureText(graphene.Mutation):
@@ -112,17 +112,18 @@ class UpdateLecture(graphene.Mutation):
 				teacher = Teacher.objects.get(user=user)
 				is_valid = Teaching.objects.get(teacher=teacher, element=lecture.section.element)
 				if is_valid:
-					if title:
-						lecture.title = title
-					if description:
-						lecture.content = description
-					if file:
-						lecture.type = getFileType(file)
-						lecture.file = file
-					if section_id:
-						section = Section.objects.get(pk=section_id)
-						lecture.section = section
-					lecture.save()
+					pass
+				# 	if title:
+				# 		lecture.title = title
+				# 	if description:
+				# 		lecture.content = description
+				# 	if file:
+				# 		lecture.type = getFileType(file)
+				# 		lecture.file = file
+				# 	if section_id:
+				# 		section = Section.objects.get(pk=section_id)
+				# 		lecture.section = section
+				#	lecture.save()
 					return UpdateLecture(ok=True)
 				else :
 					raise Exception(makeJson("PERMISSION", "You are not allowed to perform this action"))

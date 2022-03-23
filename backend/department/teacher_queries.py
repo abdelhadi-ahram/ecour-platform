@@ -89,14 +89,18 @@ class TeacherQueries(graphene.ObjectType):
 		user = info.context.user
 		if user.is_authenticated:
 			try:
+				lecture = Lecture.objects.get(pk=lecture_id)
+				element = lecture.section.element
 				teacher = Teacher.objects.get(user=user)
-				teaching = Teaching.objects.get(pk=teaching_id, teacher=teacher)
-				return teaching.element
+				teaching = Teaching.objects.get(element=element, teacher=teacher)
+				return lecture
 			except Teacher.DoesNotExist:
 				raise GraphQLError(makeJson("PERMISSION", "You don't have the permission to see this content"))
-			except Teaching.DoesNotExist:
+			except Lecture.DoesNotExist:
 				raise GraphQLError(makeJson("DATAERROR", "The provided data is not valid"))
-			except :
-				raise GraphQLError(makeJson("DATAERROR", "Could not perform the last operation"))
+			except Teaching.DoesNotExist:
+				raise GraphQLError(makeJson("PERMISSION", "You can not perform this operation"))
 		else :
 			raise GraphQLError(makeJson("LOGIN", "You are not logged in"))
+
+

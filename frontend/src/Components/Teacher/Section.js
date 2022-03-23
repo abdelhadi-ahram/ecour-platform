@@ -8,6 +8,10 @@ import {
   gql
 } from "@apollo/client"
 
+import {
+  useNavigate
+} from "react-router-dom"
+
 function getType(type){
 	switch(type){
 		case "pdf":
@@ -32,6 +36,8 @@ const DELETE_LECTURE = gql`
 function Section({name, content}){
   const [deleteLectureId, setDeleteLectureId] = React.useState(0)
 
+  const navigate = useNavigate()
+
   const [deleteLectureById, {data, loading, error}] = useMutation(DELETE_LECTURE, {
     refetchQueries : [
       "GetElementLectures"
@@ -43,7 +49,7 @@ function Section({name, content}){
   }
 
   function updateLecture(id){
-
+    navigate("/my/update-lecture-file/" + id)
   }
 
   function Notify(){
