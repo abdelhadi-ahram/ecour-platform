@@ -1,7 +1,7 @@
 import graphene
 from graphene_django import DjangoObjectType
 from authentication.models import Department, Teacher
-from department.models import Teaching, Module, Section, Lecture, Element
+from department.models import Teaching, Module, Section, Lecture, Element, Homework
 
 from graphql import GraphQLError
 import json
@@ -29,10 +29,15 @@ class LectureType(DjangoObjectType):
 		model = Lecture
 		fields = "__all__"
 
+class HomeworkType(DjangoObjectType):
+	class Meta:
+		model = Homework 
+		fields = "__all__"
+
 class SectionType(DjangoObjectType):
 	class Meta:
 		model = Section
-		fields = ("id", "element", "name", "lectures")
+		fields = ("id", "element", "name", "lectures", "homeworks")
 
 class ElementType(DjangoObjectType):
 	class Meta:
@@ -44,6 +49,7 @@ class ModuleType(DjangoObjectType):
 		model = Module
 		fields = ("name", "department", "id")
 
+
 class TeacherQueries(graphene.ObjectType):
 	get_teachings = graphene.List(TeachingType)
 	department = graphene.Field(DepartmentType)
@@ -51,6 +57,7 @@ class TeacherQueries(graphene.ObjectType):
 	section = graphene.Field(SectionType)
 	lecture = graphene.Field(LectureType)
 	module = graphene.Field(ModuleType)
+	homework = graphene.Field(HomeworkType)
 
 	get_lecture_by_id = graphene.Field(LectureType, lecture_id=graphene.ID())
 

@@ -2,6 +2,8 @@
 import {useParams, useNavigate} from "react-router-dom"
 import React from "react"
 
+import {PulseSquare} from "../../Loadings"
+
 import {
   useQuery,
   useMutation,
@@ -12,7 +14,7 @@ import TextEditor from "../../Editor";
 
 const UPDATE_LECTURE_TEXT = gql`
   mutation UpdateLectureText($lectureId:ID!, $title: String!, $content: String!){
-    addLectureText(id: $lectureId, title: $title, content: $content){
+    updateLecture(id: $lectureId, title: $title, content: $content){
       ok
     }
   }
@@ -32,12 +34,19 @@ function UpdateLectureText(){
   const {lectureId} = useParams()
   const navigate = useNavigate()
 
-  const [input, setInput] = React.useState(initialValue);
+  const [input, setInput] = React.useState(null);
   const [title, setTitle] = React.useState("");
 
-  const {data, error, loading} = useQuery(GET_LECTURE, {variables : {lectureId}})
+  const {data, error, loading} = useQuery(GET_LECTURE, {
+    variables : {lectureId},
+    fetchPolicy: "network-only"
+  })
 
-  const [updateLecture, updateLectureResponse] = useMutation(UPDATE_LECTURE_TEXT)
+  const [updateLecture, updateLectureResponse] = useMutation(UPDATE_LECTURE_TEXT, 
+  {refetchQueries : [
+       "GetElementLectures"
+     ]
+  })
 
   function cancelClicked(){
     navigate("/my")
@@ -50,8 +59,12 @@ function UpdateLectureText(){
   }
 
   React.useEffect(() => {
-      setTitle(data?.getLectureById?.title || "")
-      setInput(JSON.parse(data?.getLectureById?.content || initialValue))
+    var content;
+    if(data?.getLectureById?.content){
+      content = JSON.parse(data?.getLectureById?.content)
+    }
+    setTitle(data?.getLectureById?.title || "")
+    setInput(content)
   }, [data])
 
   return (
@@ -66,7 +79,7 @@ function UpdateLectureText(){
 
             <div className="flex flex-col space-y-1">
               <p className="text-gray-600 font-semibold">Content</p>
-              <TextEditor value={input} setValue={setInput} />
+              {input ? (<TextEditor value={input} setValue={setInput} />) : (<PulseSquare width="full" height="[200px]" />)}
             </div>
 
             <div className="flex items-center justify-end">
@@ -83,7 +96,7 @@ const initialValue = [
   {
     type: "paragraph",
     children: [
-      { text: " " },
+      { text: " default" },
     ]
   }
 ]

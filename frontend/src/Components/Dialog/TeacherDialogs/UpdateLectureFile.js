@@ -36,7 +36,10 @@ function UpdateLectureFile(){
   const [title, setTitle] = React.useState("")
   const [file, setFile] = React.useState(null)
 
-  const {data, error, loading} = useQuery(GET_LECTURE, {variables : {lectureId}})
+  const {data, error, loading} = useQuery(GET_LECTURE, {
+    variables : {lectureId},
+    fetchPolicy: "network-only"
+  })
 
   const [updateLectureFile, updateLectureResponse] = useMutation(UPDATE_LECTURE_FILE,
    {refetchQueries : [

@@ -19,7 +19,6 @@ const DEPARTMENT = [
 
 export default function RightPannel(props){
   const [selected, setSelected] = React.useState(0)
-  const ar = [1,2,5,6,3,2,8,5,9,5,8,4]
   return(
     <div className="w-full h-screen overflow-y-auto pt-8 pr-8 flex flex-col">
         <div className="w-[1/2] justify-center">

@@ -1,5 +1,5 @@
 from django.db import models
-from authentication.models import Teacher
+from authentication.models import Teacher, Student
 from authentication.models import Department
 
 
@@ -54,3 +54,26 @@ class Lecture(models.Model):
 
 	def __str__(self):
 		return self.title
+
+
+
+class Homework(models.Model):
+	title = models.CharField(max_length=255)
+	content = models.TextField(null=True)
+	file = models.FileField(upload_to='homeworks/exercices', null=True)
+	deadline = models.DateTimeField()
+	section = models.ForeignKey(Section, related_name="homeworks", on_delete=models.CASCADE)
+
+	def __str__(self):
+		return str(self.id) + "-" +self.title[:10]
+
+
+class StudentHomeworkAnswer(models.Model):
+	student = models.ForeignKey(Student, related_name="student_homeworks", on_delete=models.CASCADE)
+	created_at = models.DateTimeField(auto_now=True)
+	homework = models.ForeignKey(Homework, related_name="answers", on_delete=models.CASCADE)
+	content = models.TextField(null=True)
+	file = models.FileField(upload_to='homeworks/answers', null=True)
+
+	def __str__(self):
+		return "" + self.student + " " +self.homework

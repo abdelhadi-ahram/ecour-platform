@@ -26,6 +26,11 @@ const GET_LECTURES = gql`
           title
           type
         }
+        homeworks {
+          id 
+          title 
+          deadline
+        }
       }
     }
   }
@@ -47,8 +52,8 @@ function Lectures(){
         <>
           {
             sections.map((section, index) => {
-              if (section.lectures.length == 0) return null
-              return <Section key={index} name={section.name} content={section.lectures} />
+              if(!section.lectures.length && !section.homeworks.length) return null
+              return <Section key={index} section={section} />
             })
           }
         </>

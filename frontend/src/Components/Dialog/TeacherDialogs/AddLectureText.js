@@ -25,7 +25,11 @@ function AddLectureText(){
   const [input, setInput] = React.useState(initialValue);
   const [title, setTitle] = React.useState("");
 
-  const [addLecture, {data, loading, error}] = useMutation(ADD_LECTURE_TEXT)
+  const [addLecture, {data, loading, error}] = useMutation(ADD_LECTURE_TEXT,
+   {refetchQueries : [
+         "GetElementLectures"
+       ]
+    })
 
   function cancelClicked(){
     navigate("/my")
