@@ -4,6 +4,9 @@ import Login from './Components/Login';
 import Teacher from './Components/Teacher';
 import './index.css';
 
+import LoginRequired from "./LoginRequired"
+import {LoadingPage} from "./Components/Loadings"
+
 import {
   Routes, Route, Navigate
 } from 'react-router-dom'
@@ -13,7 +16,24 @@ import {
   gql
 } from "@apollo/client"
 
-function LoginRequired(props){
+
+function Announce(){
+  const {data, error} = useQuery(gql`
+    {
+      getLoggedUser
+    }
+    `)
+
+    if(data) {
+      return (
+      <b>{data.getLoggedUser}
+      </b>)
+    }
+
+    return <LoadingPage />
+}
+
+function AlreadyLoggedin(props){
   const GET_LOGGED_USER = gql`
     {
       getLoggedUser
@@ -23,23 +43,12 @@ function LoginRequired(props){
   const {data, error} = useQuery(GET_LOGGED_USER)
 
   if(data){
-    return props.children
+    return <Navigate to="/my" replace />
   }
-  if(error) return <Navigate to="/login" replace />
 
-  return <b>Waiting</b>
-}
+  if(error) return props.children
 
-function Announce(){
-  const {data, error} = useQuery(gql`
-    {
-      getLoggedUser
-    }
-    `)
-
-    if(data) return <b>{data.getLoggedUser}</b>
-
-    return <b>Error</b>
+  return <LoadingPage />
 }
 
 export default function App() {
@@ -47,8 +56,8 @@ export default function App() {
       <Routes>
         <Route exact path="/" element={<Announce />} />
         <Route path="/my/*" element={<LoginRequired><Teacher /></LoginRequired>}></Route>
-        <Route path="login" element={<Login />} />
-        <Route path="*" element={<b>404 Not found</b>} />
+        <Route path="/login" element={<AlreadyLoggedin><Login /></AlreadyLoggedin>} />
+        <Route path="*" element={<Navigate to="/my" replace />} />
       </Routes>
     )
 }

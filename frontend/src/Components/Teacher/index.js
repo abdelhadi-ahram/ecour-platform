@@ -27,6 +27,7 @@ export default function Teacher() {
       <Routes>
         <Route path="*" element={<Department />} />
         <Route path="/students" element={<Students />} />
+        <Route path="/manage-department" element={<b>Hello world</b>} />
       </Routes>
     </RightPanel>
   </div>
