@@ -1,11 +1,16 @@
 import React from 'react';
+import UserProvider from "../UserProvider"
 
 export default function TopBar(props){
+  const firstName = React.useContext(UserProvider)
   return(
     <div className="w-full px-2">
         <div className="py-1 flex items-center justify-between">
-            <p className="text-gray-800 font-semibold text-2xl">Welcome ,{props.name}</p>
+            <p className="text-gray-800 font-semibold text-2xl">Welcome , {firstName}</p>
               <div className="flex items-center space-x-4 rounded-lg bg-white py-2 px-4">
+                <div className='text-gray-500 '>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
+                </div>
                 <div className='text-gray-500 '>
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                 </div>

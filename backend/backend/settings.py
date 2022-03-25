@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'graphene_file_upload',
     'authentication',
     'department',
+    'student',
     'corsheaders'
 ]
 

@@ -5,7 +5,7 @@ from authentication.models import Department
 
 class Module(models.Model):
 	name = models.CharField(max_length=150, unique=True)
-	department = models.ForeignKey(Department, on_delete=models.CASCADE)
+	department = models.ForeignKey(Department, related_name="modules", on_delete=models.CASCADE)
 
 	created_at = models.DateTimeField(auto_now=True)
 
@@ -14,7 +14,7 @@ class Module(models.Model):
 
 
 class Element(models.Model):
-	module = models.ForeignKey(Module, on_delete=models.CASCADE)
+	module = models.ForeignKey(Module, related_name="elements", on_delete=models.CASCADE)
 	name = models.CharField(max_length=150, unique=True)
 	created_at = models.DateTimeField(auto_now=True)
 

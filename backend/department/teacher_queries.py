@@ -47,7 +47,7 @@ class ElementType(DjangoObjectType):
 class ModuleType(DjangoObjectType):
 	class Meta:
 		model = Module
-		fields = ("name", "department", "id")
+		fields = ("name", "department", "id", "elements")
 
 
 class TeacherQueries(graphene.ObjectType):

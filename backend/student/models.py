@@ -1,7 +1,15 @@
 from django.db import models
 
-from authentication.models import Student
-from department.models import Element, Lecture
+from authentication.models import Student, Department
+from department.models import Element, Lecture, Homework, Module
+
+class Studying(models.Model):
+	department = models.ForeignKey(Department, related_name="studyings", on_delete=models.CASCADE)
+	module = models.ForeignKey(Module, on_delete=models.CASCADE)
+	created_at = models.DateTimeField(auto_now=True)
+
+	def __str__(self):
+		return str(self.student) + " in " + str(self.department)
 
 class ElementLog(models.Model):
 	student = models.ForeignKey(Student, on_delete=models.CASCADE)
@@ -10,6 +18,7 @@ class ElementLog(models.Model):
 
 
 class LectureLog():
-	student = models.ForeignKey(Student, related_name="accessed_lectures")
-	lecture = models.ForeignKey(Lecture, related_name="accessed_by", null=True)
-	homework = models.ForeignKey(Homework, related_name="accessed_by", null=True)
+	student = models.ForeignKey(Student, related_name="accessed_lectures", on_delete=models.CASCADE)
+	lecture = models.ForeignKey(Lecture, related_name="accessed_by", null=True, on_delete=models.CASCADE)
+	homework = models.ForeignKey(Homework, related_name="accessed_by", null=True, on_delete=models.CASCADE)
+	created_at = models.DateTimeField(auto_now=True)

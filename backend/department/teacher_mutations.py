@@ -8,6 +8,7 @@ from graphql import GraphQLError
 
 import json
 import datetime
+
 def getFileType(file):
 	if file.endswith(("jpg","png", "jpeg")):
 		return "image"

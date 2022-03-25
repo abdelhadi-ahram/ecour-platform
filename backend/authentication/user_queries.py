@@ -23,7 +23,7 @@ class UserType(DjangoObjectType):
 
 class UserQuery(graphene.ObjectType):
     authenticate_user = graphene.Field(UserType, email=graphene.String(), password=graphene.String())
-    get_logged_user = graphene.String()
+    get_logged_user = graphene.Field(UserType)
 
     def resolve_authenticate_user(self, info, email, password):
         user = authenticate(email=email, password=password)
@@ -34,5 +34,5 @@ class UserQuery(graphene.ObjectType):
 
     def resolve_get_logged_user(self, info):
         if info.context.user.is_authenticated:
-            return info.context.user.get_full_name()
+            return info.context.user
         raise GraphQLError("You are not logged in")

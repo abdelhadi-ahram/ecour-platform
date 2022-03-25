@@ -2,6 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import Login from './Components/Login';
 import Teacher from './Components/Teacher';
+import Student from './Components/Student';
+
 import './index.css';
 
 import LoginRequired from "./LoginRequired"
@@ -36,7 +38,10 @@ function Announce(){
 function AlreadyLoggedin(props){
   const GET_LOGGED_USER = gql`
     {
-      getLoggedUser
+      getLoggedUser{
+        firstName 
+        role
+      }
     }
   `;
 
@@ -55,7 +60,7 @@ export default function App() {
     return(
       <Routes>
         <Route exact path="/" element={<Announce />} />
-        <Route path="/my/*" element={<LoginRequired><Teacher /></LoginRequired>}></Route>
+        <Route path="/my/*" element={<LoginRequired></LoginRequired>}></Route>
         <Route path="/login" element={<AlreadyLoggedin><Login /></AlreadyLoggedin>} />
         <Route path="*" element={<Navigate to="/my" replace />} />
       </Routes>

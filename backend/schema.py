@@ -15,9 +15,10 @@ from department.teacher_mutations import (
 
 from authentication.user_queries import UserQuery
 from department.teacher_queries import TeacherQueries
+from student.student_queries import StudentQueries
 
 
-class Query(TeacherQueries, UserQuery, graphene.ObjectType):
+class Query(TeacherQueries, UserQuery, StudentQueries, graphene.ObjectType):
     pass
 
 

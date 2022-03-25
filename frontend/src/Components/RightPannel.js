@@ -1,21 +1,6 @@
 import React from 'react';
 import TopBar from './TopBar';
-
-const DEPARTMENT = [
-  {
-    "name" : "GI",
-    "id" : 1,
-  },
-  {
-    "name" : "TCC",
-    "id" : 2,
-  },
-  {
-    "name" : "GBI",
-    "id" : 1,
-  }
-]
-
+import Calender from "./Calender"
 
 export default function RightPannel(props){
   const [selected, setSelected] = React.useState(0)
@@ -25,15 +10,15 @@ export default function RightPannel(props){
           <TopBar />
         </div>
 
-       <div className="py-3 px-2 flex space-x-3 grow overflow-y-hidden">
-
-            <div className="w-3/4 shrink overflow-y-auto">
+       <div className="py-3 px-2 flex space-x-1 grow overflow-y-hidden">
+            <div className="w-3/4 shrink overflow-y-auto pr-2">
+              <div className="w-full h-2 bg-gray-100 blur sticky top-0"></div>
                   {props.children}
             </div>
 
 
-            <div className="w-1/4 bg-white rounded-lg shadow p-1 grow-0">
-
+            <div className="w-1/4 rounded-lg p-1 grow-0">
+              <Calender />
             </div>
 
         </div>
