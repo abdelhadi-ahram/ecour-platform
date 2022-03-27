@@ -3,6 +3,10 @@ import classesImages from "./images";
 import {Transition} from "@headlessui/react";
 import Progressbar from './ProgressBar';
 
+import {
+  Link 
+} from "react-router-dom"
+
 
 function Element({element,module, index}){
   const [isMenuShown, setIsMenuShown] = React.useState(false)
@@ -19,7 +23,7 @@ function Element({element,module, index}){
       <div className='w-full mx-3 space-y-5'>
         <div className="flex justify-between">
           <div class="flex flex-col items-start justify-start">
-            <p className="text-gray-700 font-semibold text-md">{element.name}</p>
+            <Link to={`/my/element/${element.id}`}><p className="text-gray-700 font-semibold text-md hover:text-gray-900">{element.name}</p></Link>
             <p className="text-gray-400 font-small text-sm">{module}</p>
           </div>
 

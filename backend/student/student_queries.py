@@ -1,12 +1,13 @@
 import graphene
 from graphene_django import DjangoObjectType
 from authentication.models import Department, Teacher, Student
-from department.models import (Teaching, Module, Section, Lecture, Element, Homework)
+from department.models import (Teaching, Module, Section, Lecture, Element, Homework, StudentHomeworkAnswer)
 
 from .models import Studying
 
 from graphql import GraphQLError
 import json
+
 
 from department.teacher_queries import (
 	DepartmentType,
@@ -39,6 +40,31 @@ class StudentType(DjangoObjectType):
 	def resolve_cin(self, info):
 		return self.user.cin
 
+class HomeworkAnswerType(DjangoObjectType):
+	class Meta:
+		model = StudentHomeworkAnswer
+		fields = "__all__"
+
+class HomeworkStudentType(DjangoObjectType):
+	class Meta:
+		model = Homework 
+		fields = "__all__"
+
+	deadline = graphene.String()
+	is_open = graphene.Boolean()
+	answer = graphene.Field(HomeworkAnswerType)
+
+	def resolve_is_open(self, info):
+		return self.is_open()
+	def resolve_deadline(self, info):
+		return self.deadline.strftime("%a, %m-%y %H:%M")
+	def resolve_answer(self, info):
+		try:
+			student = Student.objects.get(user=info.context.user)
+			return StudentHomeworkAnswer.objects.filter(homework=self, student=student).first()
+		except Student.DoesNotExist:
+			return None
+
 
 class StudentQueries(graphene.ObjectType):
 	get_department_modules = graphene.List(ModuleType)
@@ -49,6 +75,11 @@ class StudentQueries(graphene.ObjectType):
 	homework = graphene.Field(HomeworkType)
 
 	get_element_content= graphene.Field(ElementType, element_id=graphene.ID())
+	get_lecture_content = graphene.Field(LectureType, lecture_id=graphene.ID())
+
+	get_homework_content = graphene.Field(HomeworkStudentType, homework_id=graphene.ID())
+
+	# get_homework_answer = graphene.Field(HomeworkAnswerType, homework_id=graphene.ID())
 
 	def resolve_get_element_content(self,info, element_id):
 		user = info.context.user
@@ -79,3 +110,44 @@ class StudentQueries(graphene.ObjectType):
 				raise GraphQLError(makeJson("PERMISSION", "You do not have the permission to see this content"))
 		else:
 			raise GraphQLError(makeJson("LOGIN", "You are not logged in"))
+
+	def resolve_get_lecture_content(self, info, lecture_id):
+		user = info.context.user 
+		if user.is_authenticated:
+			try:
+				student = Student.objects.get(user=user)
+				department = student.department
+				lecture = Lecture.objects.get(pk=lecture_id)
+				module = lecture.section.element.module
+				is_valid = Studying.objects.get(department=department, module=module)
+				if is_valid:
+					return lecture
+			except Studying.DoesNotExist:
+				raise GraphQLError(makeJson("PERMISSION", "You do not have the permission to see this content"))
+			except Student.DoesNotExist:
+				raise GraphQLError(makeJson("PERMISSION", "You do not have the permission to see this content"))
+			except Lecture.DoesNotExist:
+				raise GraphQLError(makeJson("DATAERROR", "The provided data is not valid"))
+
+		return GraphQLError(makeJson("LOGIN", "You are not logged in"))
+
+
+	def resolve_get_homework_content(self, info, homework_id):
+		user = info.context.user 
+		if user.is_authenticated:
+			try:
+				student = Student.objects.get(user=user)
+				department = student.department
+				homework = Homework.objects.get(pk=homework_id)
+				module = homework.section.element.module
+				is_valid = Studying.objects.get(department=department, module=module)
+				if is_valid:
+					return homework
+			except Studying.DoesNotExist:
+				raise GraphQLError(makeJson("PERMISSION", "You do not have the permission to see this content"))
+			except Student.DoesNotExist:
+				raise GraphQLError(makeJson("PERMISSION", "You do not have the permission to see this content"))
+			except Homework.DoesNotExist:
+				raise GraphQLError(makeJson("DATAERROR", "The provided data is not valid"))
+
+		return GraphQLError(makeJson("LOGIN", "You are not logged in"))

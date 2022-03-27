@@ -2,6 +2,7 @@ from django.db import models
 from authentication.models import Teacher, Student
 from authentication.models import Department
 
+from django.utils import timezone
 
 class Module(models.Model):
 	name = models.CharField(max_length=150, unique=True)
@@ -66,6 +67,9 @@ class Homework(models.Model):
 
 	def __str__(self):
 		return str(self.id) + "-" +self.title[:10]
+
+	def is_open(self):
+		return timezone.now() < self.deadline
 
 
 class StudentHomeworkAnswer(models.Model):

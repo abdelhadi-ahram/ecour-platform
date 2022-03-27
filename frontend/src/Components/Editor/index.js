@@ -63,7 +63,7 @@ const TextEditor = ({ value, setValue, height}) => {
       <div className="">
         <Slate editor={editor} value={value} onChange={setValue} >
 
-          <div style={{height}} className={"border boredr-gray-200 p-2"}>
+          <div style={{height}} className={"border boredr-gray-200 p-2 hover:border-gray-300"}>
             <Editable
               renderLeaf={renderLeaf}
               placeholder="Type some text.."

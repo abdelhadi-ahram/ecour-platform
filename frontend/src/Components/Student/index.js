@@ -4,6 +4,8 @@ import Sidebar from '../Sidebar';
 import RightPanel from '../RightPannel';
 import ElementDetails from './ElementDetails';
 import Dashboard from './Dashboard';
+import LectureDetails from "./LectureDetails"
+import HomeworkDetails from "./HomeworkDetails"
 
 import Buttons from './studentsButtons';
 import '../../index.css';
@@ -26,6 +28,8 @@ export default function Student() {
             <Routes>
               <Route path="/" element={<Dashboard />} />
               <Route path="/element/:elementId" element={<ElementDetails />} />
+              <Route path="/lecture/:lectureId" element={<LectureDetails />} />
+              <Route path="/homework/:homeworkId" element={<HomeworkDetails />} />
             </Routes>
 
           </RightPanel>
