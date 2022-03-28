@@ -52,7 +52,7 @@ function Element({element,module, index}){
 
       {/*progressbar*/}
         <div className="">
-          <Progressbar  progress={52}/>
+          <Progressbar  progress={element.progress}/>
         </div>
       </div>
 

@@ -11,14 +11,32 @@ class Studying(models.Model):
 	def __str__(self):
 		return str(self.student) + " in " + str(self.department)
 
-class ElementLog(models.Model):
+class LectureFinished(models.Model):
 	student = models.ForeignKey(Student, on_delete=models.CASCADE)
-	element = models.ForeignKey(Element, on_delete=models.CASCADE)
+	lecture = models.ForeignKey(Lecture, on_delete=models.CASCADE)
 	created_at = models.DateTimeField(auto_now=True)
 
+	class Meta:
+		unique_together = ('student', 'lecture',)
 
-class LectureLog():
+	def __str__(self):
+		return str(self.student) + " finished " + str(self.lecture)
+
+class HomeworkFinished(models.Model):
+	student = models.ForeignKey(Student, on_delete=models.CASCADE)
+	homework = models.ForeignKey(Homework, on_delete=models.CASCADE)
+	created_at = models.DateTimeField(auto_now=True)
+
+	class Meta:
+		unique_together = ('student', 'homework',)
+
+	def __str__(self):
+		return str(self.student) + " finished " + str(self.homework)
+
+
+class ElementLog(models.Model):
 	student = models.ForeignKey(Student, related_name="accessed_lectures", on_delete=models.CASCADE)
 	lecture = models.ForeignKey(Lecture, related_name="accessed_by", null=True, on_delete=models.CASCADE)
 	homework = models.ForeignKey(Homework, related_name="accessed_by", null=True, on_delete=models.CASCADE)
+	element = models.ForeignKey(Element, related_name="accessed_by", null=True, on_delete=models.CASCADE)
 	created_at = models.DateTimeField(auto_now=True)

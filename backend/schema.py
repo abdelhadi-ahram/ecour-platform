@@ -16,7 +16,7 @@ from department.teacher_mutations import (
 from authentication.user_queries import UserQuery
 from department.teacher_queries import TeacherQueries
 from student.student_queries import StudentQueries
-from student.student_mutations import AddHomeworkAnswer
+from student.student_mutations import AddHomeworkAnswer, ToggleLectureFinished
 
 
 class Query(TeacherQueries, UserQuery, StudentQueries, graphene.ObjectType):
@@ -33,5 +33,6 @@ class Mutations(graphene.ObjectType):
     add_homework = AddHomework.Field()
     delete_homework = DeleteHomework.Field()
     add_homework_answer = AddHomeworkAnswer.Field()
+    toggle_lecture_finished = ToggleLectureFinished.Field()
 
 schema = graphene.Schema(query=Query, mutation=Mutations)

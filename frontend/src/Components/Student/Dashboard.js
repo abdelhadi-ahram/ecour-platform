@@ -34,6 +34,7 @@ const GET_ELEMENTS = gql`
     elements{
       id
       name
+      progress
     }
   }
 }

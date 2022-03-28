@@ -1,10 +1,14 @@
 import graphene
 from graphene_django import DjangoObjectType
-from authentication.models import Department, Teacher
+from authentication.models import Department, Teacher, Student
 from department.models import Teaching, Module, Section, Lecture, Element, Homework
 
 from graphql import GraphQLError
 import json
+
+from student.models import HomeworkFinished, LectureFinished
+
+import math
 
 def makeJson(type, text):
 	response = {
@@ -43,6 +47,20 @@ class ElementType(DjangoObjectType):
 	class Meta:
 		model = Element
 		fields = ("id", "module","name","sections")
+
+	progress = graphene.Float()
+
+	def resolve_progress(self, info):
+		user = info.context.user 
+		try:
+			student = Student.objects.get(user=user) 
+			elements = Lecture.objects.filter(section__element=self).count() + Homework.objects.filter(section__element=self).count()
+			done = LectureFinished.objects.filter(lecture__section__element=self, student=student).count() + HomeworkFinished.objects.filter(homework__section__element=self, student=student).count()
+			if(elements):
+				return math.floor((done / elements) * 100)
+			return 0
+		except :
+			return 0
 
 class ModuleType(DjangoObjectType):
 	class Meta:

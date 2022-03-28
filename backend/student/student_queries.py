@@ -8,6 +8,9 @@ from .models import Studying
 from graphql import GraphQLError
 import json
 
+from .models import HomeworkFinished, LectureFinished
+
+from .logger import register
 
 from department.teacher_queries import (
 	DepartmentType,
@@ -24,7 +27,6 @@ def makeJson(type, text):
 		"text" : text
 	}
 	return json.dumps(response)
-
 
 class StudentType(DjangoObjectType):
 	class Meta:
@@ -53,11 +55,18 @@ class HomeworkStudentType(DjangoObjectType):
 	deadline = graphene.String()
 	is_open = graphene.Boolean()
 	answer = graphene.Field(HomeworkAnswerType)
+	is_finished = graphene.Boolean()
 
 	def resolve_is_open(self, info):
 		return self.is_open()
 	def resolve_deadline(self, info):
 		return self.deadline.strftime("%a, %m-%y %H:%M")
+	def resolve_is_finished(self, info):
+		try:
+			student = Student.objects.get(user=info.context.user)
+			return HomeworkFinished.objects.filter(homework=self, student=student).exists()
+		except Student.DoesNotExist:
+			return False
 	def resolve_answer(self, info):
 		try:
 			student = Student.objects.get(user=info.context.user)
@@ -65,6 +74,19 @@ class HomeworkStudentType(DjangoObjectType):
 		except Student.DoesNotExist:
 			return None
 
+class StudentLectureType(DjangoObjectType):
+	class Meta:
+		model = Lecture
+		fields = "__all__"
+
+	is_finished = graphene.Boolean()
+
+	def resolve_is_finished(self, info):
+		try:
+			student = Student.objects.get(user=info.context.user)
+			return LectureFinished.objects.filter(lecture=self, student=student).exists()
+		except Student.DoesNotExist:
+			return False
 
 class StudentQueries(graphene.ObjectType):
 	get_department_modules = graphene.List(ModuleType)
@@ -75,7 +97,7 @@ class StudentQueries(graphene.ObjectType):
 	homework = graphene.Field(HomeworkType)
 
 	get_element_content= graphene.Field(ElementType, element_id=graphene.ID())
-	get_lecture_content = graphene.Field(LectureType, lecture_id=graphene.ID())
+	get_lecture_content = graphene.Field(StudentLectureType, lecture_id=graphene.ID())
 
 	get_homework_content = graphene.Field(HomeworkStudentType, homework_id=graphene.ID())
 
@@ -88,10 +110,11 @@ class StudentQueries(graphene.ObjectType):
 				student = Student.objects.get(user=user)
 				department = student.department
 				element = Element.objects.get(pk=element_id)
+				is_valid = Studying.objects.get(department=department, module=element.module)
 
-				Studying.objects.get(department=department, module=element.module)
-
-				return element
+				if is_valid:
+					register(student=student, element=element)
+					return element
 			except Student.DoesNotExist:
 				raise GraphQLError(makeJson("PERMISSION", "You do not have the permission to see this content"))
 			except Studying.DoesNotExist:
@@ -121,6 +144,7 @@ class StudentQueries(graphene.ObjectType):
 				module = lecture.section.element.module
 				is_valid = Studying.objects.get(department=department, module=module)
 				if is_valid:
+					register(student=student, lecture=lecture)
 					return lecture
 			except Studying.DoesNotExist:
 				raise GraphQLError(makeJson("PERMISSION", "You do not have the permission to see this content"))
@@ -142,6 +166,7 @@ class StudentQueries(graphene.ObjectType):
 				module = homework.section.element.module
 				is_valid = Studying.objects.get(department=department, module=module)
 				if is_valid:
+					register(student=student, homework=homework)
 					return homework
 			except Studying.DoesNotExist:
 				raise GraphQLError(makeJson("PERMISSION", "You do not have the permission to see this content"))

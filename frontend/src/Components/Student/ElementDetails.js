@@ -8,6 +8,7 @@ import {
 } from "react-router-dom"
 
 import {
+	useMutation,
 	useQuery,
 	gql
 } from "@apollo/client"
@@ -39,18 +40,41 @@ const GET_ELEMENT_CONTENT = gql`
 	      	id
 	        title
 	        type
+	        isFinished
 	      }
 	      homeworks {
 	      	id
 	        title
+	        isFinished
 	      }
 	    }
 	  }
 	}
 `;
 
+const TOGGLE_LECTURE_FINISHED = gql`
+	mutation ToggleLectureFinished($lectureId:ID, $homeworkId: ID){
+		toggleLectureFinished(lectureId: $lectureId, homeworkId: $homeworkId){
+			ok
+		}
+	}
+`;
+
 function Lecture({item, type}){
-	const [isChecked, setIsChecked] = React.useState(false);
+
+	const [toggleLectureFinished, {data, loading, error}] = useMutation(TOGGLE_LECTURE_FINISHED, {
+		refetchQueries : [
+			"GetElementContent"
+		]
+	})
+
+	if(error) console.log(JSON.stringify(error))
+
+	function toggle(){
+		const variables = {}
+		type == "homework" ? variables.homeworkId = item.id : variables.lectureId = item.id
+		toggleLectureFinished({variables})
+	}
 
 	return(
 		<div className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 cursor-pointer">
@@ -60,7 +84,7 @@ function Lecture({item, type}){
 					<p className="text-gray-600">{item.title}</p>
 				</Link>
 			</div>
-            <div onClick={() => setIsChecked(!isChecked)} className={`${isChecked ? "text-green-500" : "text-gray-400 hover:text-gray-600"}`}>
+            <div onClick={toggle} className={`${item.isFinished ? "text-green-500" : "text-gray-400 hover:text-gray-600"} ${loading ? "animate-spin" : ""}`}>
 	            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
             </div>
 		</div>
