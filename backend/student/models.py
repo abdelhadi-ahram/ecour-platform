@@ -11,6 +11,9 @@ class Studying(models.Model):
 	def __str__(self):
 		return str(self.student) + " in " + str(self.department)
 
+	class Meta:
+		db_table = "study_in"
+
 class LectureFinished(models.Model):
 	student = models.ForeignKey(Student, on_delete=models.CASCADE)
 	lecture = models.ForeignKey(Lecture, on_delete=models.CASCADE)
@@ -21,6 +24,9 @@ class LectureFinished(models.Model):
 
 	def __str__(self):
 		return str(self.student) + " finished " + str(self.lecture)
+
+	class Meta:
+		db_table = "lecture_finished"
 
 class HomeworkFinished(models.Model):
 	student = models.ForeignKey(Student, on_delete=models.CASCADE)
@@ -33,6 +39,9 @@ class HomeworkFinished(models.Model):
 	def __str__(self):
 		return str(self.student) + " finished " + str(self.homework)
 
+	class Meta:
+		db_table = "homework_finished"
+
 
 class ElementLog(models.Model):
 	student = models.ForeignKey(Student, related_name="accessed_lectures", on_delete=models.CASCADE)
@@ -40,3 +49,6 @@ class ElementLog(models.Model):
 	homework = models.ForeignKey(Homework, related_name="accessed_by", null=True, on_delete=models.CASCADE)
 	element = models.ForeignKey(Element, related_name="accessed_by", null=True, on_delete=models.CASCADE)
 	created_at = models.DateTimeField(auto_now=True)
+
+	class Meta:
+		db_table = "element_log"

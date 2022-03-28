@@ -54,6 +54,9 @@ class User(AbstractBaseUser):
 	def get_short_name(self):
 		return self.first_name
 
+	class Meta:
+		db_table = "user"
+
 
 class Teacher(models.Model):
 	user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
@@ -61,6 +64,9 @@ class Teacher(models.Model):
 	def __str__(self):
 		str = self.user.get_full_name()
 		return str
+
+	class Meta:
+		db_table = "teacher"
 
 
 class Department(models.Model):
@@ -72,9 +78,15 @@ class Department(models.Model):
 	def __str__(self):
 		return self.name 
 
+	class Meta:
+		db_table = "department"
+
 class Student(models.Model):
 	user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
 	department = models.ForeignKey(Department, on_delete=models.CASCADE)
 
 	def __str__(self):
 		return self.user.get_full_name()
+
+	class Meta:
+		db_table = "student"
