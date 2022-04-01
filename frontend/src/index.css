@@ -3,3 +3,18 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+@layer components {
+  .input {
+    @apply rounded border border-gray-200 dark:border-zinc-700 px-2 py-1 focus:outline-none bg-transparent hover:border-gray-300 dark:hover:border-zinc-600 dark:text-gray-300;
+  }
+
+  .cancel-btn {
+  	@apply px-4 py-[6px] text-gray-500 bg-gray-100 dark:bg-zinc-700 rounded-md mx-3  hover:bg-gray-200 dark:hover:bg-zinc-600 hover:text-gray-600 dark:text-gray-400;
+  }
+
+  .post-btn {
+  	@apply px-4 py-[6px] text-white bg-blue-400 disabled:bg-blue-300 dark:disabled:opacity-60 font-bold rounded-md shadow border border-transparent focus:ring-1 focus:ring-blue-400 hover:shadow-lg;
+  }
+}

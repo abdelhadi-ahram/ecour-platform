@@ -63,8 +63,9 @@ const TextEditor = ({ value, setValue, height}) => {
       <div className="">
         <Slate editor={editor} value={value} onChange={setValue} >
 
-          <div style={{height}} className={"border boredr-gray-200 p-2 hover:border-gray-300"}>
+          <div style={{height}} className={"border boredr-gray-200 dark:border-zinc-700 p-2 hover:border-gray-300 dark:hover:border-zinc-600 rounded-md"}>
             <Editable
+              className="dark:text-gray-200 w-full h-full overflow-y-auto"
               renderLeaf={renderLeaf}
               placeholder="Type some text.."
               renderElement={renderElement}
@@ -91,7 +92,7 @@ const TextEditor = ({ value, setValue, height}) => {
             />
           </div>
 
-          <div className="flex justify-center items-center rounded border border-gray-200 my-2 space-x-2">
+          <div className="flex justify-center items-center rounded border border-gray-200 dark:border-zinc-700 my-2 space-x-2">
             {MARK_BUTTONS.map((item, index) =>{
               return <MarkButton key={`${item}-${index}`} format={item.format} icon={item.icon} />
             })}

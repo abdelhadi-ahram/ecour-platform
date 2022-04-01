@@ -18,7 +18,7 @@ export default function TLButtons(){
           return <div
             onClick={() => {setSelected(index)}}
             key={"icon-" + index}
-            className={`p-2 rounded-xl ${isSelected ? "bg-[#6aa5ff] text-white" : "bg-white text-gray-400 hover:bg-gray-50 hover:text-gray-500"}`}
+            className={`p-2 rounded-xl ${isSelected ? "bg-[#6aa5ff] dark:bg-blue-500 text-white dark:text-gray-200" : "bg-white dark:bg-zinc-800 text-gray-400 dark:text-gray-500 hover:bg-gray-50 dark:hover:bg-zinc-700 hover:text-gray-500 dark:hover:text-gray-300"}`}
             >{item}</div>
         })
       }

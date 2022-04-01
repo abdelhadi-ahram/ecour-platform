@@ -10,12 +10,12 @@ import Students from "./Students"
 import '../../index.css';
 
 import {
-  Routes, Route
+  Routes, Route, Navigate
 } from "react-router-dom";
 
 export default function Teacher() {
   return(
-<div className="w-screen h-screen bg-[#f5f6f8] font-nunito flex">
+<div className="w-screen h-screen bg-[#f5f6f8] dark:bg-zinc-900 font-nunito flex">
   <div className="h-screen flex flex-col items-center justify-center px-6 py-8">
     <Sidebar>
     <Buttons />
@@ -25,9 +25,10 @@ export default function Teacher() {
   <div className="w-full h-screen">
     <RightPanel >
       <Routes>
-        <Route path="*" element={<Department />} />
+        <Route path="" element={<Department />} />
         <Route path="/students" element={<Students />} />
         <Route path="/manage-department" element={<b>Hello world</b>} />
+        <Route path="*" element={<Navigate to="/my" />} />
       </Routes>
     </RightPanel>
   </div>

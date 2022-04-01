@@ -62,30 +62,30 @@ function AddLectureFile(){
 
   return (
     <div className="fixed inset-0 z-20 flex flex-col items-center justify-center">
-      <div className="bg-black opacity-20 fixed inset-0  z-0"></div>
-      <div className="w-[400px] p-6 rounded-xl bg-white z-10 flex flex-col items-center justify-center space-y-1">
+      <div className="bg-black opacity-20 dark:opacity-40 fixed inset-0  z-0"></div>
+      <div className="w-[400px] p-6 rounded-xl bg-white dark:bg-zinc-800 z-10 flex flex-col items-center justify-center space-y-1">
         <div className="w-full flex flex-col space-y-4">
             {error && <p className="w-full p-2 rounded-lg bg-red-50 text-red-500">An error has been occurred, please try again</p>}
             <div className="flex flex-col space-y-1">
-              <p className="text-gray-600 font-semibold">Title</p>
-              <input value={title} onChange={e => setTitle(e.target.value)} className="w-full rounded border border-gray-200 px-2 py-1 focus:outline-none hover:border-gray-300" />
+              <p className="text-gray-600 dark:text-gray-400 font-semibold">Title</p>
+              <input value={title} onChange={e => setTitle(e.target.value)} className="w-full bg-transparent rounded border border-gray-200 dark:border-zinc-700 px-2 py-1 focus:outline-none hover:border-gray-300 dark:hover:border-zinc-600 text-gray-700 dark:text-gray-200" />
             </div>
 
             <div className="flex flex-col space-y-1">
-              <p className="text-gray-600 font-semibold">Content</p>
+              <p className="text-gray-600 dark:text-gray-400 font-semibold">Content</p>
               <div className="w-full ">
 
                 <DragAndDrop setDrag={setDrag} onDrop={onDrop}>
-                  <div className={`rounded-lg ${drag ? "bg-blue-50" : "bg-white"} h-full border-2 border-dashed border-blue-400 flex flex-col items-center justify-center py-4`}>
+                  <div className={`rounded-lg ${drag ? "bg-blue-50 dark:bg-zinc-700" : "bg-white dark:bg-zinc-800"} h-full border-2 border-dashed border-blue-400 flex flex-col items-center justify-center py-4`}>
                     {
                       file ? (                          
-                        <p className="text-gray-700 w-3/4 text-center font-semibold my-3">{file.name + " (" + Math.round((file.size / 1024)) + "KB)"}</p> 
+                        <p className="text-gray-700 dark:text-gray-200 w-3/4 text-center font-semibold my-3">{file.name + " (" + Math.round((file.size / 1024)) + "KB)"}</p> 
                       ):(
                         <>
                           <div className="text-blue-400">
                             <svg className="w-14 h-14" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" /></svg>
                           </div>
-                          <p className="text-gray-700 w-3/4 text-center text-sm font-semibold">Drag your document here to start uploading</p>
+                          <p className="text-gray-700 dark:text-gray-200 w-3/4 text-center text-sm font-semibold">Drag your document here to start uploading</p>
                           <div className="flex items-center justify-center space-x-1">
                             <div className="h-[1px] w-10 bg-gray-500"></div>
                             <span className="text-gray-500 text-xs my-2">OR</span>
@@ -105,8 +105,8 @@ function AddLectureFile(){
             </div>
 
             <div className="flex items-center justify-end">
-              <button onClick={cancelClicked} className="px-4 py-[6px] text-gray-500 bg-gray-100 rounded-md mx-3 text-md hover:bg-gray-200 hover:text-gray-600">Cancel</button>
-              <button disabled={!(title && file)} onClick={postData} className="px-4 py-[6px] text-white bg-blue-400 disabled:bg-blue-300 font-bold rounded-md text-md shadow border border-white focus:ring-1 focus:ring-blue-400 hover:shadow-lg">Post</button>
+              <button onClick={cancelClicked} className="px-4 py-[6px] cancel-btn">Cancel</button>
+              <button disabled={!(title && file)} onClick={postData} className="post-btn">Post</button>
             </div>
         </div>
       </div>

@@ -68,10 +68,10 @@ function Homeworks({homeworks}){
       <Notify />
       {homeworks.map((homework, index) => {
           return (
-            <div key={index} className="flex justify-between px-3 py-2 hover:bg-gray-50 rounded">
+            <div key={index} className="flex justify-between px-3 py-2 hover:bg-gray-50 dark:hover:bg-zinc-700 rounded">
               <div className="flex space-x-2">
                 <span className="text-gray-400">{getType()}</span>
-                <p className="text-gray-700">{homework.title}</p>
+                <p className="text-gray-700 dark:text-gray-300">{homework.title}</p>
               </div>
               <div className="flex space-x-3">
                 <span className="text-red-400 hover:text-red-500" onClick={() => {deleteHomework(homework.id)}}>

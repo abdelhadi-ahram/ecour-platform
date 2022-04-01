@@ -1,6 +1,7 @@
 import React from "react";
 import Section from "./Section";
 import {AddLecture} from "../Dialog/TeacherDialogs"
+import {LoadingCard} from "../Loadings"
 
 
 import {
@@ -60,7 +61,9 @@ function Lectures(){
       )
     }
 
-    return <b>Witing for data... </b>
+    return (
+      <div className="flex space-x-3"><LoadingCard /><LoadingCard /><LoadingCard /></div>
+    )
 }
 
 
@@ -92,23 +95,23 @@ function Departments(){
 
 	return(
 		<div className="flex flex-col space-y-3 flex-1">
-      <div className="py-1 sticky top-0 bg-gray-100">
-    		<div className="rounded-xl bg-white flex overflow-hidden shadow p-1">
+      <div className="py-1 sticky top-0 bg-gray-100 dark:bg-zinc-900">
+    		<div className="rounded-xl bg-white dark:bg-zinc-800 flex overflow-hidden shadow p-1">
         {
           data?.getTeachings.map((teaching, index) => {
             let selected = teaching.id == (selectedDepartment)
-            const selectedClass = "bg-blue-50 text-blue-500";
-            const unselectedClass = "bg-white text-gray-500 hover:text-gray-700"
+            const selectedClass = "bg-blue-50 dark:bg-zinc-700 text-blue-400";
+            const unselectedClass = "bg-white dark:bg-zinc-800 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
             return <div onClick={() => {setSelectedDepartment(teaching.id); console.log(selectedDepartment)}} key={index} className={`w-32 flex items-center justify-center p-1 rounded-lg font-semibold cursor-pointer ${selected ? selectedClass : unselectedClass}`}>{teaching.department.name}</div>
           })
         }
     		</div>
       </div>
 
-  			<div className="w-full bg-white rounded-lg px-3 py-2">
+  			<div className="w-full bg-white dark:bg-zinc-800 rounded-lg px-3 py-2">
   				<div className="flex items-center justify-end">
   					<Link to="/my/select-section">
-              <button className="px-3 py-1 rounded-lg text-sky-500 bg-blue-50 hover:text-sky-600 focus:ring-1 focus:ring-sky-300">+ Add</button>
+              <button className="px-3 py-1 rounded-lg text-sky-500 bg-blue-50 dark:bg-zinc-700 hover:text-sky-600 dark:hover:text-sky-400 focus:ring-1 focus:ring-sky-300 dark:focus:ring-blue-400">+ Add</button>
             </Link>
           </div>
 

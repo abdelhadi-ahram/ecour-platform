@@ -7,7 +7,7 @@ import {
 } from "@apollo/client"
 
 import {
-  useNavigate
+  useNavigate, Link
 } from "react-router-dom"
 
 function getType(type){
@@ -71,10 +71,10 @@ function Lectures({lectures}){
       <Notify />
       {lectures.map((lecture, index) => {
           return (
-            <div key={index} className="flex justify-between px-3 py-2 hover:bg-gray-50 rounded">
+            <div key={index} className="flex justify-between px-3 py-2 hover:bg-gray-50 dark:hover:bg-zinc-700 rounded">
               <div className="flex space-x-2">
                 <span className="text-gray-400">{getType(lecture.type)}</span>
-                <p className="text-gray-700">{lecture.title}</p>
+                <Link to={`/my/lecture-details/${lecture.id}`}><p className="text-gray-700 dark:text-gray-300">{lecture.title}</p></Link>
               </div>
               <div className="flex space-x-3">
                 <span className="text-red-400 hover:text-red-500" onClick={() => {deleteLecture(lecture.id)}}>

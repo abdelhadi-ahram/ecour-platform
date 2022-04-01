@@ -14,7 +14,7 @@ function Day({dateObject, showMonth}){
   let blanks = [];
   for (let i = 0; i < firstDayOfMonth(); i++) {
     blanks.push(
-      <td className="cursor-none bg-gray-50">{""}</td>
+      <td className="cursor-none bg-gray-50 dark:bg-zinc-800">{""}</td>
     );
   }
 
@@ -30,8 +30,8 @@ function Day({dateObject, showMonth}){
    for (let d = 1; d <=31; d++) {
      let isCurrentDay = d == getCurrentDay();
      daysInMonth.push(
-       <td key={d} className="cursor-pointer text-gray-500">
-         <div className={`p-1 text-sm block ${isCurrentDay ? "text-blue-400 font-bold bg-blue-50" : "hover:-translate-y-1 hover:bg-gray-100 hover:text-gray-700"} rounded-lg`}>{d}</div>
+       <td key={d} className="cursor-pointer text-gray-500 dark:text-gray-400">
+         <div className={`p-1 text-sm block ${isCurrentDay ? "text-blue-400 font-bold bg-blue-50 dark:bg-zinc-700" : "hover:-translate-y-1 hover:bg-gray-100 dark:hover:bg-zinc-700 hover:text-gray-700 dark:hover:text-gray-300"} rounded-lg`}>{d}</div>
        </td>
      );
    }
@@ -54,14 +54,14 @@ function Day({dateObject, showMonth}){
   });
 
   return(
-    <div className="bg-white rounded-xl px-3 py-5 shadow flex flex-col space-y-3">
+    <div className="bg-white dark:bg-zinc-800 rounded-xl px-3 py-5 shadow flex flex-col space-y-3">
       <div className="flex items-center justify-between">
-        <p className="text-gray-700 font-semibold text-md hover:bg-gray-100 px-2 py-1 rounded cursor-pointer" onClick={showMonth}>{getCurrentDate()}</p>
+        <p className="text-gray-700 dark:text-gray-200 font-semibold text-md hover:bg-gray-100 dark:hover:bg-zinc-700 px-2 py-1 rounded cursor-pointer" onClick={showMonth}>{getCurrentDate()}</p>
         <div className="flex items-center space-x-3 text-blue-400">
-          <span className="rounded-full bg-blue-50 p-1">
+          <span className="rounded-full bg-blue-50 dark:bg-zinc-700 p-1">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
           </span>
-          <span className="rounded-full bg-blue-50 p-1">
+          <span className="rounded-full bg-blue-50 dark:bg-zinc-700 p-1">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
           </span>
         </div>
@@ -70,7 +70,7 @@ function Day({dateObject, showMonth}){
         <thead>
           <tr>
           {weekdaysShort.map(day => {
-            return <th className="text-sm text-gray-500 font-semibold">{day}</th>
+            return <th className="text-sm text-gray-500 dark:text-gray-400 font-semibold">{day}</th>
           })}
           </tr>
           </thead>

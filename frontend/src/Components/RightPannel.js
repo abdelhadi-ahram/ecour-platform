@@ -12,7 +12,7 @@ export default function RightPannel(props){
 
        <div className="py-3 px-2 flex space-x-1 grow overflow-y-hidden">
             <div className="w-3/4 shrink overflow-y-auto pr-2">
-              <div className="w-full h-2 bg-gray-100 blur sticky top-0"></div>
+              <div className="w-full h-2 bg-gray-100 dark:bg-zinc-900 blur sticky top-0"></div>
                   {props.children}
             </div>
 
