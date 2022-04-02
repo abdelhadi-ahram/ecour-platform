@@ -253,3 +253,43 @@ class DeleteHomework(graphene.Mutation):
 				raise GraphQLError(e)
 		else:
 			raise GraphQLError(makJson("LOGIN", "You are not logged in"))
+
+
+
+class UpdateHomework(graphene.Mutation):
+	class Arguments:
+		homework_id = graphene.ID()
+		title = graphene.String(required=False)
+		content = graphene.String(required=False)
+		file = Upload(required=False)
+		deadline = graphene.String(required=False)
+
+	ok = graphene.Boolean()
+
+	def mutate(self, info, homework_id, title="", deadline="", content=None, file=None):
+		user = info.context.user
+		if user.is_authenticated:
+			try:
+				teacher = Teacher.objects.get(user=user)
+				homework = Homework.objects.get(id=homework_id)
+				if Teaching.objects.filter(teacher=teacher, element=homework.section.element).exists():
+					if title:
+						homework.title = title
+					if deadline:
+						homework.deadline = deadline
+					if content:
+						homework.content = content
+					if file:
+						homework.file = file 
+					homework.save()
+					return AddSection(ok=True)
+				else:
+					raise GraphQLError(makeJson("PERMISSION", "You do not have the right to perform this action"))
+			except Teaching.DoesNotExist:
+				raise GraphQLError(makeJson("PERMISSION", "Only teachers are allowed to perform this action"))
+			except Section.DoesNotExist:
+				raise GraphQLError(makeJson("DATAERROR", "The provided data is not valid"))
+			except Exception as e:
+				raise GraphQLError(e)
+		else:
+			raise GraphQLError(makJson("LOGIN", "You are not logged in"))

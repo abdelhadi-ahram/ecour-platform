@@ -7,7 +7,7 @@ import {
 } from "@apollo/client"
 
 import {
-  useNavigate
+  useNavigate, Link
 } from "react-router-dom"
 
 function getType(type){
@@ -71,7 +71,7 @@ function Homeworks({homeworks}){
             <div key={index} className="flex justify-between px-3 py-2 hover:bg-gray-50 dark:hover:bg-zinc-700 rounded">
               <div className="flex space-x-2">
                 <span className="text-gray-400">{getType()}</span>
-                <p className="text-gray-700 dark:text-gray-300">{homework.title}</p>
+                <Link to={`/my/homework-details/${homework.id}`} ><p className="text-gray-700 dark:text-gray-300">{homework.title}</p></Link>
               </div>
               <div className="flex space-x-3">
                 <span className="text-red-400 hover:text-red-500" onClick={() => {deleteHomework(homework.id)}}>

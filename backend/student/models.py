@@ -9,7 +9,7 @@ class Studying(models.Model):
 	created_at = models.DateTimeField(auto_now=True)
 
 	def __str__(self):
-		return str(self.student) + " in " + str(self.department)
+		return str(self.module) + " in " + str(self.department)
 
 	class Meta:
 		db_table = "study_in"

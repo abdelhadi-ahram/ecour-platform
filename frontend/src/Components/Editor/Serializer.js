@@ -16,7 +16,7 @@ function CreateNode(node){
 
     if(node.bold) element = <strong>{element}</strong>
     if(node.italic) element = <i>{element}</i>
-    if(node.code) element = <code className="text-blue-400 bg-blue-50">{element}</code>
+    if(node.code) element = <code className="text-blue-400 px-[2px] bg-blue-50 dark:bg-zinc-700">{element}</code>
     if(node.underline) element = <u>{element}</u>
 
     return element
@@ -39,7 +39,7 @@ function Serializer(nodes){
   if(!Array.isArray(nodes)) return null
     
   return (
-    <div className="text-gray-700 py-2">{
+    <div className="text-gray-700 dark:text-gray-300 py-2">{
       nodes?.map(node => {
         return CreateNode(node)
       })

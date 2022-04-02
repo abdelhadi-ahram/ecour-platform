@@ -6,6 +6,8 @@ import Dashboard from './Dashboard';
 import Buttons from './teacherButtons';
 import Department from './Department';
 import Students from "./Students"
+import LectureDetails from "./LectureDetails"
+import HomeworkDetails from "./HomeworkDetails"
 
 import '../../index.css';
 
@@ -25,10 +27,11 @@ export default function Teacher() {
   <div className="w-full h-screen">
     <RightPanel >
       <Routes>
-        <Route path="" element={<Department />} />
+        <Route path="/*" element={<Department />} />
         <Route path="/students" element={<Students />} />
         <Route path="/manage-department" element={<b>Hello world</b>} />
-        <Route path="*" element={<Navigate to="/my" />} />
+        <Route path="/lecture-details/:lectureId" element={<LectureDetails />} />
+        <Route path="/homework-details/:homeworkId" element={<HomeworkDetails />} />
       </Routes>
     </RightPanel>
   </div>

@@ -18,7 +18,8 @@ from department.teacher_queries import (
 	HomeworkType,
 	SectionType,
 	ElementType,
-	ModuleType
+	ModuleType,
+	HomeworkAnswerType
 	)
 
 def makeJson(type, text):
@@ -35,6 +36,7 @@ class StudentType(DjangoObjectType):
 
 	full_name = graphene.String()
 	cin = graphene.String()
+	email = graphene.String()
 
 	def resolve_full_name(self, info):
 		return self.user.get_full_name()
@@ -42,10 +44,9 @@ class StudentType(DjangoObjectType):
 	def resolve_cin(self, info):
 		return self.user.cin
 
-class HomeworkAnswerType(DjangoObjectType):
-	class Meta:
-		model = StudentHomeworkAnswer
-		fields = "__all__"
+	def resolve_email(self, info):
+		return self.user.email
+
 
 class HomeworkStudentType(DjangoObjectType):
 	class Meta:

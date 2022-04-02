@@ -111,7 +111,7 @@ function Departments(){
   			<div className="w-full bg-white dark:bg-zinc-800 rounded-lg px-3 py-2">
   				<div className="flex items-center justify-end">
   					<Link to="/my/select-section">
-              <button className="px-3 py-1 rounded-lg text-sky-500 bg-blue-50 dark:bg-zinc-700 hover:text-sky-600 dark:hover:text-sky-400 focus:ring-1 focus:ring-sky-300 dark:focus:ring-blue-400">+ Add</button>
+              <button className="add-btn">+ Add</button>
             </Link>
           </div>
 

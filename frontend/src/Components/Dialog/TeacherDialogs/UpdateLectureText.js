@@ -30,7 +30,7 @@ const GET_LECTURE = gql`
 `;
 
 
-function UpdateLectureText(){
+function UpdateLectureText({onCancel}){
   const {lectureId} = useParams()
   const navigate = useNavigate()
 
@@ -44,18 +44,22 @@ function UpdateLectureText(){
 
   const [updateLecture, updateLectureResponse] = useMutation(UPDATE_LECTURE_TEXT, 
   {refetchQueries : [
-       "GetElementLectures"
+       "GetElementLectures","GetLectureById"
      ]
   })
 
   function cancelClicked(){
-    navigate("/my")
+    if(onCancel){
+      onCancel(false)
+    } else {
+      navigate("/my")
+    }
   }
 
   function postData(){
     var content = JSON.stringify(input)
     updateLecture({variables : {lectureId, title, content}})
-    navigate("/my")
+    cancelClicked()
   }
 
   React.useEffect(() => {
@@ -96,7 +100,7 @@ const initialValue = [
   {
     type: "paragraph",
     children: [
-      { text: " default" },
+      { text: "" },
     ]
   }
 ]

@@ -98,7 +98,7 @@ class StudentHomeworkAnswer(models.Model):
 	file = models.FileField(upload_to='homeworks/answers', null=True)
 
 	def __str__(self):
-		return "" + self.student + " " +self.homework
+		return "" + str(self.student) + " " + str(self.homework)
 
 	class Meta:
 		db_table = "student_homework_answer"

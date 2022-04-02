@@ -36,3 +36,4 @@ class UserQuery(graphene.ObjectType):
         if info.context.user.is_authenticated:
             return info.context.user
         raise GraphQLError("You are not logged in")
+
