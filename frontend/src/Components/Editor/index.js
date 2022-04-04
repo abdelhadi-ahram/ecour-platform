@@ -5,6 +5,8 @@ import ColorPicker from "./ColorPicker"
 import BlockCode from "./BlockCode"
 import SoftBreak from 'slate-soft-break'
 
+import {Transition} from "@headlessui/react"
+
 
 import {
   Editor,
@@ -39,8 +41,9 @@ const BLOCK_BUTTONS = [
 ]
 
 
-const TextEditor = ({ value, setValue, height}) => {
-  const editor = useMemo(() => withReact(withHistory(createEditor())), []);
+const TextEditor = ({ value, setValue, height, restValueTo}) => {
+  var editor = useMemo(() => withReact(withHistory(createEditor())), []);
+  //const [showButtons, setShowButtons] = React.useState(false)
 
   const { isVoid, deleteBackward } = editor
   const renderLeaf = useCallback(props => <Leaf {...props} />, []);
@@ -60,11 +63,12 @@ const TextEditor = ({ value, setValue, height}) => {
 
   return(
     <div className="flex flex-col justify-center my-2">
-      <div className="">
+      <div className="rounded border boredr-gray-200 dark:border-zinc-700 p-1 hover:border-gray-300 dark:hover:border-zinc-600  group">
         <Slate editor={editor} value={value} onChange={setValue} >
 
-          <div style={{height}} className={"border boredr-gray-200 dark:border-zinc-700 p-2 hover:border-gray-300 dark:hover:border-zinc-600 rounded-md"}>
+          <div className={"rounded-md p-2"}>
             <Editable
+              style={{maxHeight: height}}
               className="dark:text-gray-200 w-full h-full overflow-y-auto"
               renderLeaf={renderLeaf}
               placeholder="Type some text.."
@@ -92,16 +96,25 @@ const TextEditor = ({ value, setValue, height}) => {
             />
           </div>
 
-          <div className="flex justify-center items-center rounded border border-gray-200 dark:border-zinc-700 my-2 space-x-2">
-            {MARK_BUTTONS.map((item, index) =>{
-              return <MarkButton key={`${item}-${index}`} format={item.format} icon={item.icon} />
-            })}
-            {BLOCK_BUTTONS.map((item, index) =>{
-              return <BlockButton key={`${item}-${index}`} format={item.format} icon={item.icon}  />
-            })}
-            <ColorPicker />
-            <button className="font-bold text-gray-400" onMouseDown={() => {toggleBlock(editor,"block-code")}}>{"{ }"}</button>
-          </div>
+          <Transition show={true}
+              enter="transform transition duration-[300ms]"
+              enterFrom="scale-y-0"
+              enterTo="scale-y-100"
+              leave="transform transition duration-[300ms]"
+              leaveFrom="scale-y-100"
+              leaveTo="scale-y-0"
+            >
+              <div className="flex justify-center items-center rounded border border-gray-200 dark:border-zinc-700 space-x-2 group-hover:border-zinc-600">
+                {MARK_BUTTONS.map((item, index) =>{
+                  return <MarkButton key={`${item}-${index}`} format={item.format} icon={item.icon} />
+                })}
+                {BLOCK_BUTTONS.map((item, index) =>{
+                  return <BlockButton key={`${item}-${index}`} format={item.format} icon={item.icon}  />
+                })}
+                <ColorPicker />
+                <button className="font-bold text-gray-400" onMouseDown={() => {toggleBlock(editor,"block-code")}}>{"{ }"}</button>
+              </div>
+            </Transition>
 
         </Slate>
       </div>
@@ -133,7 +146,7 @@ const isMarkActive = (editor, format) => {
 function MarkButton({icon, format}) {
   const editor = useSlate()
   return (
-    <button className={`p-1 rounded ${isMarkActive(editor, format) ? " text-purple-500 " : " text-gray-400"}`} onMouseDown={() => {toggleMark(editor,format)}}>
+    <button className={`p-1 rounded ${isMarkActive(editor, format) ? " text-blue-400 dark:text-blue-500 " : " text-gray-400"}`} onMouseDown={() => {toggleMark(editor,format)}}>
       <FontAwesomeIcon icon={icon}/>
     </button>
   )

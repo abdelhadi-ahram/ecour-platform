@@ -5,6 +5,7 @@ import AddLectureFile from "./AddLectureFile"
 import UpdateLectureFile from "./UpdateLectureFile"
 import UpdateLectureText from "./UpdateLectureText"
 import AddHomework from "./AddHomework"
+import UpdateHomework from "./UpdateHomework"
 
 import {
   Routes, Route, Navigate
@@ -24,6 +25,7 @@ export function AddLecture(){
       <Route path="/update-lecture-file/:lectureId" element={<UpdateLectureFile />} />
       <Route path="/update-lecture-text/:lectureId" element={<UpdateLectureText />} />
       <Route path="/add-homework/:sectionId" element={<AddHomework />} />
+      <Route path="/update-homework/:homeworkId" element={<UpdateHomework />} />
     </Routes>
   )
 }

@@ -1,13 +1,14 @@
 import React from "react";
 import TextEditor from "../../Editor";
 import Drag from "../../DragFile";
+import getFileName from "../../getFileName"
 
 import {
 	useNavigate, useParams
 } from "react-router-dom";
 
 import {
-	useQuery,
+	useLazyQuery,
 	useMutation,
 	gql
 } from "@apollo/client";
@@ -21,9 +22,8 @@ const UPDATE_HOMEWORK = gql`
 }
 `;
 
-
 const GET_HOMEWORK_CONTENT = gql`
-	query GetHomeworkById($homeworkId: ID!){
+	query GetHomeworkContent($homeworkId: ID!){
 		getHomeworkById(homeworkId: $homeworkId){
 		    title
 		    content
@@ -34,25 +34,26 @@ const GET_HOMEWORK_CONTENT = gql`
 	}
 `;
 
-function UpdateHomework({onCancel}){
+
+function UpdateHomework({onCancel, homework}){
 	const {homeworkId} = useParams()
 	const navigate = useNavigate()
-	const [title, setTitle] = React.useState("")
-	const [date, setDate] = React.useState("15-01-2022")
-	const [time, setTime] = React.useState("12:00")
-	const [input, setInput] = React.useState(initialValue)
+	const [title, setTitle] = React.useState(homework?.title || "")
+	const [date, setDate] = React.useState(homework?.deadlineDate || "")
+	const [time, setTime] = React.useState(homework?.deadlineTime || "12:00")
+	const [input, setInput] = React.useState(homework ? JSON.parse(homework?.content) : initialValue)
 	const [file, setFile] = React.useState(null)
+	const [existedFile, setExistedFile] = React.useState(getFileName(homework?.file) || "")
 	const [drag, setDrag] = React.useState(false)
+
+	const [getHomeworkContent, {data, error, loading}] = useLazyQuery(GET_HOMEWORK_CONTENT)
 
 	const [updateHomework, updateHomeworkResult] = useMutation(UPDATE_HOMEWORK, {
 		refetchQueries : [
-			"GetElementLectures"
+			"GetHomeworkById"
 		]
 	})
 
-	const {data, error, loading} = useQuery(GET_HOMEWORK_CONTENT, {
-		variables : {homeworkId}
-	})
 
 	function cancelClicked(){
 		if(onCancel){
@@ -80,12 +81,17 @@ function UpdateHomework({onCancel}){
 		cancelClicked()
 	}
 
-	React.useEffect(() => {
-		setTitle(data?.getHomeworkById.title || "")
-		setDate(new Date(data?.getHomeworkById.deadlineDate) || "")
-		setTime(data?.getHomeworkById.deadlineTime || "")
-		//setInput(data?.getHomeworkById.content ? JSON.parse(data?.getHomeworkById.content) : initialValue)
+	React.useEffect(() =>{
+		if(!homework) getHomeworkContent({variables : {homeworkId}});
+		if(data){
+			setTitle(data.getHomeworkById.title || "")
+			setDate(data.getHomeworkById.deadlineDate || "")
+			setTime(data.getHomeworkById.deadlineTime || "")
+			setInput(JSON.parse(data.getHomeworkById.content))
+			setExistedFile(getFileName(data.getHomeworkById.file) || "")
+		}
 	}, [data])
+
 
 	return(
 		<div className="fixed inset-0 z-20 flex flex-col items-center justify-center">
@@ -101,7 +107,7 @@ function UpdateHomework({onCancel}){
 	            <div className="flex flex-col space-y-1 w-full">
 	              <p className="text-gray-600 dark:text-gray-300 font-semibold">Deadline</p>
 	              <div className="flex items-center space-x-3">
-	              	<input value={date} onChange={(e) => setDate(e.target.value)} type="date" className="w-full rounded bg-transparent border border-gray-200 dark:border-zinc-700 dark:text-gray-200 px-2 py-1 focus:outline-none hover:border-gray-300 dark:hover:border-zinc-600" />
+	              	<input value={date}  onChange={(e) => setDate(e.target.value)} type="date" className="w-full rounded bg-transparent border border-gray-200 dark:border-zinc-700 dark:text-gray-200 px-2 py-1 focus:outline-none hover:border-gray-300 dark:hover:border-zinc-600" />
 	              	<input value={time} onChange={(e) => {setTime(e.target.value)}} type="time" className="w-full rounded bg-transparent border border-gray-200 dark:border-zinc-700 dark:text-gray-200 px-2 py-1 focus:outline-none hover:border-gray-300 dark:hover:border-zinc-600" />
 	            	</div>
 	            </div>
@@ -111,9 +117,9 @@ function UpdateHomework({onCancel}){
 		            <div className="flex flex-col space-y-1">
 		              <div className="flex justify-between items-center">
 		              	<p className="text-gray-600 dark:text-gray-300 font-semibold">Content <span className="text-gray-400 text-sm">(drag and drop a file here)</span></p>
-		              	{file && 
+		              	{(file || existedFile) && 
 			              <div className="px-4 py-1 rounded-full bg-blue-50 dark:bg-zinc-700 flex justify-between items-center space-x-4 border-2 border-dashed border-blue-400">
-			              	<p className="text-gray-600 dark:text-gray-400 font-semibold">{file.name}</p>
+			              	<p className="text-gray-600 dark:text-gray-400 font-semibold">{file?.name || existedFile}</p>
 			              	<span className="text-gray-500 dark:text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" onClick={() => setFile(null)}>
 			              		<svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
 			              	</span>
@@ -135,7 +141,7 @@ function UpdateHomework({onCancel}){
 
 	            <div className="flex items-center justify-end">
 	              <button onClick={cancelClicked} className="px-4 py-[6px] text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-zinc-700 rounded-md mx-3 text-md hover:bg-gray-200 hover:text-gray-600 dark:hover:text-gray-300 dark:text-gray-400">Cancel</button>
-	              <button onClick={postData} className="px-4 py-[6px] text-white bg-blue-400 disabled:bg-blue-300 dark:disabled:opacity-40 font-bold rounded-md text-md shadow border border-transparent focus:ring-1 focus:ring-blue-400 hover:shadow-lg">Post</button>
+	              <button onClick={postData} className="update-btn py-[6px]">Update</button>
 	            </div>
 	        </div>
 	      </div>
@@ -144,7 +150,7 @@ function UpdateHomework({onCancel}){
 }
 
 
-const initialValue = [
+const initialValue =[
   {
     type: "paragraph",
     children: [

@@ -8,8 +8,8 @@ import Department from './Department';
 import Students from "./Students"
 import LectureDetails from "./LectureDetails"
 import HomeworkDetails from "./HomeworkDetails"
-
-import '../../index.css';
+import AddExam from './AddExam'
+import EditExam from './EditExam'
 
 import {
   Routes, Route, Navigate
@@ -25,15 +25,15 @@ export default function Teacher() {
   </div>
 
   <div className="w-full h-screen">
-    <RightPanel >
       <Routes>
-        <Route path="/*" element={<Department />} />
-        <Route path="/students" element={<Students />} />
-        <Route path="/manage-department" element={<b>Hello world</b>} />
-        <Route path="/lecture-details/:lectureId" element={<LectureDetails />} />
-        <Route path="/homework-details/:homeworkId" element={<HomeworkDetails />} />
+        <Route path="/*" element={<RightPanel><Department /></RightPanel>} />
+        <Route path="/students" element={<RightPanel><Students /></RightPanel>} />
+        <Route path="/manage-department" element={<RightPanel><b>Hello world</b></RightPanel>} />
+        <Route path="/lecture-details/:lectureId" element={<RightPanel><LectureDetails /></RightPanel>} />
+        <Route path="/homework-details/:homeworkId" element={<RightPanel><HomeworkDetails /></RightPanel>} />
+        <Route path="/add-exam/:sectionId" element={<RightPanel><AddExam /></RightPanel>} />
+        <Route path="/edit-exam/:examId" element={<RightPanel withoutCalendar><EditExam /></RightPanel>} />
       </Routes>
-    </RightPanel>
   </div>
 
 </div>

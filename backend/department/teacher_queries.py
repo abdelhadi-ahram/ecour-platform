@@ -7,6 +7,7 @@ from graphql import GraphQLError
 import json
 
 from student.models import HomeworkFinished, LectureFinished, ElementLog
+from exam.models import QuestionType 
 
 import math
 
@@ -82,7 +83,7 @@ class HomeworkType(DjangoObjectType):
 
 	deadline_date = graphene.String()
 	def resolve_deadline_date(self, info):
-		return self.deadline.strftime("%d-%m-%Y")
+		return self.deadline.strftime("%Y-%m-%d")
 
 	deadline_time = graphene.String()
 	def resolve_deadline_time(self, info):
@@ -122,6 +123,10 @@ class ModuleType(DjangoObjectType):
 		model = Module
 		fields = ("name", "department", "id", "elements")
 
+class QuestionTypeType(DjangoObjectType):
+	class Meta:
+		model = QuestionType
+		fields = ("id", "type")
 
 
 class TeacherQueries(graphene.ObjectType):
@@ -136,6 +141,8 @@ class TeacherQueries(graphene.ObjectType):
 
 	get_lecture_by_id = graphene.Field(LectureType, lecture_id=graphene.ID())
 	get_homework_by_id = graphene.Field(HomeworkType, homework_id=graphene.ID())
+
+	get_question_types = graphene.List(QuestionTypeType)
 
 	def resolve_get_teachings(self, info):
 		user = info.context.user
@@ -206,5 +213,8 @@ class TeacherQueries(graphene.ObjectType):
 				raise GraphQLError(makeJson("PERMISSION", "You can not perform this operation"))
 		else :
 			raise GraphQLError(makeJson("LOGIN", "You are not logged in"))
+
+	def resolve_get_question_types(self, info):
+		return QuestionType.objects.all()
 
 

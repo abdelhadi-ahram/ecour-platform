@@ -18,6 +18,8 @@ const GET_HOMEWORK_CONTENT = gql`
 		    title
 		    content
 		    file
+		    deadlineDate 
+		    deadlineTime
 		    section{
 		    	element{
 		    		name
@@ -38,7 +40,7 @@ const GET_HOMEWORK_CONTENT = gql`
 
 
 function HomeworkDetails(){
-	const [isUpdate, setIsUpdate] = React.useState(true)
+	const [isUpdate, setIsUpdate] = React.useState(false)
 	const {homeworkId} = useParams()
 	const {data, loading, error} = useQuery(GET_HOMEWORK_CONTENT, {variables : {homeworkId}})
 
@@ -53,7 +55,7 @@ function HomeworkDetails(){
 	return(
 	<>
 	{
-		isUpdate && <UpdateHomework onCancel={setIsUpdate} />
+		isUpdate && <UpdateHomework homework={data?.getHomeworkById} onCancel={setIsUpdate} />
 	}
 		<div className="flex flex-col space-y-3">
 			<div className="w-full rounded-xl py-2 px-4 bg-white dark:bg-zinc-800 flex justify-between items-center">
@@ -69,7 +71,7 @@ function HomeworkDetails(){
 			</div>
 			<div className="w-full bg-white dark:bg-zinc-800 rounded-xl px-4 py-2 rounded shadow">
 				<div className="flex justify-end w-full">
-					<button className="update-btn" >update</button>
+					<button className="update-btn" onClick={() => setIsUpdate(true)} >update</button>
 				</div>
 				<div className="flex flex-col space-y-1">
 					<div className="">

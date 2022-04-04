@@ -3,6 +3,7 @@ from graphene_file_upload.scalars import Upload
 import graphene
 from .models import Section, Teaching, Lecture, Element, Homework
 from authentication.models import Teacher
+from exam.models import Exam
 
 from graphql import GraphQLError
 
@@ -149,7 +150,7 @@ class DeleteLecture(graphene.Mutation):
 				lecture = Lecture.objects.get(id=lecture_id)
 				if Teaching.objects.filter(teacher=teacher, element=lecture.section.element).exists():
 					lecture.delete()
-					return AddSection(ok=True)
+					return DeleteLecture(ok=True)
 				else:
 					raise GraphQLError(makeJson("PERMISSION", "You do not have the right to perform this action"))
 			except Teacher.DoesNotExist:
@@ -213,7 +214,7 @@ class AddHomework(graphene.Mutation):
 					#endtime = datetime.datetime.strptime(deadline, "%y-%m-%d %H:%M")
 					homework = Homework(title=title, content=content, deadline=deadline, file=file, section=section)
 					homework.save()
-					return AddSection(ok=True)
+					return AddHomework(ok=True)
 				else:
 					raise GraphQLError(makeJson("PERMISSION", "You do not have the right to perform this action"))
 			except Teaching.DoesNotExist:
@@ -240,7 +241,7 @@ class DeleteHomework(graphene.Mutation):
 				homework = Homework.objects.get(id=homework_id)
 				if Teaching.objects.filter(teacher=teacher, element=homework.section.element).exists():
 					homework.delete()
-					return AddSection(ok=True)
+					return DeleteHomework(ok=True)
 				else:
 					raise GraphQLError(makeJson("PERMISSION", "You do not have the right to perform this action"))
 			except Teacher.DoesNotExist:
@@ -282,7 +283,44 @@ class UpdateHomework(graphene.Mutation):
 					if file:
 						homework.file = file 
 					homework.save()
-					return AddSection(ok=True)
+					return UpdateHomework(ok=True)
+				else:
+					raise GraphQLError(makeJson("PERMISSION", "You do not have the right to perform this action"))
+			except Teaching.DoesNotExist:
+				raise GraphQLError(makeJson("PERMISSION", "Only teachers are allowed to perform this action"))
+			except Section.DoesNotExist:
+				raise GraphQLError(makeJson("DATAERROR", "The provided data is not valid"))
+			except Exception as e:
+				raise GraphQLError(e)
+		else:
+			raise GraphQLError(makJson("LOGIN", "You are not logged in"))
+
+
+class AddExam(graphene.Mutation):
+	class Arguments:
+		title = graphene.String()
+		description = graphene.String()
+		starts_at = graphene.String()
+		duration = graphene.String()
+		attempts = graphene.Int()
+		sequentiel = graphene.Boolean()
+		section_id = graphene.ID()
+
+	id = graphene.ID()
+
+	def mutate(self, info, title, section_id, starts_at=None, duration=None, description=None, attempts=None, sequentiel=False):
+		user = info.context.user
+		if user.is_authenticated:
+			try:
+				teacher = Teacher.objects.get(user=user)
+				section = Section.objects.get(id=section_id)
+				if Teaching.objects.filter(teacher=teacher, element=section.element).exists():
+					d = datetime.datetime.strptime(duration, "%H:%M")
+					delta_duration = datetime.timedelta(hours=d.hour, minutes=d.minute)
+
+					exam = Exam(title=title, description=description, starts_at=starts_at, duration=delta_duration, section=section, sequentiel=sequentiel, attempts=attempts)
+					exam.save()
+					return AddExam(id=exam.id)
 				else:
 					raise GraphQLError(makeJson("PERMISSION", "You do not have the right to perform this action"))
 			except Teaching.DoesNotExist:
