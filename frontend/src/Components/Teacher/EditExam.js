@@ -2,9 +2,12 @@ import React from "react";
 import TextEditor from "../Editor"
 import {Transition} from "@headlessui/react"
 
+import {
+	useParams, useNavigate
+} from "react-router-dom"
 
 import {
-	useQuery,gql
+	useMutation,useQuery,gql
 } from "@apollo/client"
 
 
@@ -68,6 +71,7 @@ function QuestionTypes({onChange, selectedItem}){
 function getQuestionProto(){
 	return {
 		content : getInitialValue(),
+		id: null,
 		type: {},
 		mark: 0,
 		choices : []
@@ -86,13 +90,57 @@ function getInitialValue(){
 }
 
 
+const ADD_QUESTIONS = gql`
+	mutation AddQuestions($examId:ID!, $examData: String!){
+		addQuestions(examId: $examId, examData: $examData){
+			ok
+		}
+	}
+`;
+
+const GET_EXAM_QUESTIONS = gql`
+	query GetExamQuestions($examId: ID!){
+	  getExamQuestions(examId: $examId){
+	  	id
+	    content
+	    mark
+	    type {
+	      id
+	      type
+	    }
+	    choices {
+	      id
+	      isCorrect
+	      content
+	    }
+	  }
+	}
+`;
+
+
 function EditExam(){
+	const navigate = useNavigate()
+	const {examId} = useParams()
 	const [questions, setQuestions] = React.useState([getQuestionProto()])
 	const [selected, setSelected] = React.useState(0)
+
 	const [editorValue, setEditorValue] = React.useState([{
 		...getQuestionProto(),
 		editor : (<TextEditor height="100px" value={questions[selected].content} setValue={setQuestionContent} />)
 	}])
+
+	const [sendQuestions , sendQuestionsData] = useMutation(ADD_QUESTIONS, {
+		onError : error => {
+			console.log(error)
+			/*const customError = JSON.parse(error.message)
+			if(customError.type != "LOGIN") setDataError({error:true, message: customError.message})
+			else navigate("/login")*/
+		}
+	})
+
+	const {data, error, loading} = useQuery(GET_EXAM_QUESTIONS, {variables : {examId}})
+
+	const [dataError, setDataError] = React.useState({error: false, message: ""})
 
 	function addChoice(e){
 		if (e.keyCode === 13) {
@@ -100,7 +148,7 @@ function EditExam(){
 	    e.preventDefault();
 
 	    const selectedQuestion = questions[selected];
-	    selectedQuestion.choices.push({content: e.target.value, isCorrect: false});
+	    selectedQuestion.choices.push({content: e.target.value, isCorrect: false, id:null});
 			setQuestions([...questions])
 			e.target.value = ""
 	  }
@@ -153,13 +201,46 @@ function EditExam(){
 
 	function publishExam(){
 		let valid = true;
-		const data = questions.map((item) => {
+		const questionsData = questions.map((item) => {
 			valid = !(!item.type.id || parseFloat(item.mark) == 0 || (item.type.type != "Plain text" && item.choices.length == 0)) 
 			return {...item, type: item.type.id};
 		})
-		if(!valid){ return }
-		console.log(JSON.stringify(data))
+		if(!valid){ 
+			setDataError({error: true, message : "Make sure that you've entered a valid mark, type and choices"})
+			return 
+		}
+		//Add questions
+		sendQuestions({variables : {examId : examId, examData: JSON.stringify(questionsData)},
+			onCompleted : (data) => {
+				navigate("/my")
+			}
+	})
+		//console.log(questionsData)
 	}
+
+	//if an error occurred
+	React.useEffect(() => {
+		if(dataError.error) setTimeout(() => setDataError({error: false, message: ""}), 5000)
+	}, [dataError])
+
+	//if data is changed
+	React.useEffect(() => {
+		if(data){
+			const questionsData = data.getExamQuestions.map(item => {
+				return {
+					mark: item.mark,
+					type: item.type, 
+					id: item.id, 
+					content: JSON.parse(item.content),
+					choices: item.choices.map(choice => {return {isCorrect: choice.isCorrect, content: choice.content, id: choice.id} })
+				}})
+			if(questionsData.length)
+				setQuestions([...questionsData])
+			else 
+				setQuestions([getQuestionProto()])
+		} 
+	}, [data])
+
 
 	return(
 		<>
@@ -171,6 +252,18 @@ function EditExam(){
 			   {/*Type and questions*/}
 					<div className="flex-1 overflow-y-auto flex flex-col space-y-2">
 						<div className="w-full bg-zinc-800 py-2 px-3 rounded-md flex flex-col space-y-3">
+							<Transition show={dataError.error}
+		              enter="transform transition duration-[400ms]"
+		              enterFrom="scale-y-0"
+		              enterTo="scale-y-100"
+		              leave="transform transition duration-[400ms]"
+		              leaveFrom="scale-y-100"
+		              leaveTo="scale-y-0"
+		            >
+		            <p className="rounded-md bg-zinc-700 px-3 py-2 border border-red-400 text-red-400">
+		            	{dataError.message}
+		            </p>
+              </Transition>
 								<div className="flex justify-between">
 										<div className="flex justify-between space-x-3">
 												<div className="flex flex-col space-y-1">

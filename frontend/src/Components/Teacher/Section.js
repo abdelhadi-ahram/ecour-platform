@@ -1,6 +1,7 @@
 import React from "react"
 import Lectures from "./Lectures"
 import Homeworks from "./Homeworks"
+import Exams from "./Exams"
 
 
 function Section({section}){
@@ -19,6 +20,8 @@ function Section({section}){
         {
           <Homeworks homeworks={section.homeworks} />
         }
+
+        <Exams exams={section.exams} />
 
   		</div>
 		</div>

@@ -12,7 +12,8 @@ from department.teacher_mutations import (
     AddHomework,
     DeleteHomework,
     UpdateHomework,
-    AddExam
+    AddExam,
+    AddQuestions
     )
 
 from authentication.user_queries import UserQuery
@@ -38,5 +39,6 @@ class Mutations(graphene.ObjectType):
     toggle_lecture_finished = ToggleLectureFinished.Field()
     update_homework = UpdateHomework.Field()
     add_exam = AddExam.Field()
+    add_questions = AddQuestions.Field()
 
 schema = graphene.Schema(query=Query, mutation=Mutations)

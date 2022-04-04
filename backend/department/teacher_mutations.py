@@ -3,7 +3,7 @@ from graphene_file_upload.scalars import Upload
 import graphene
 from .models import Section, Teaching, Lecture, Element, Homework
 from authentication.models import Teacher
-from exam.models import Exam
+from exam.models import (Exam, QuestionType, Choice, Question)
 
 from graphql import GraphQLError
 
@@ -23,7 +23,7 @@ def getFileType(file):
 def makeJson(type, text):
 	response = {
 		"type" : type,
-		"text" : text
+		"message" : text
 	}
 	return json.dumps(response)
 
@@ -162,7 +162,7 @@ class DeleteLecture(graphene.Mutation):
 			except Exception as e:
 				raise GraphQLError(e)
 		else:
-			raise GraphQLError(makJson("LOGIN", "You are not logged in"))
+			raise GraphQLError(makeJson("LOGIN", "You are not logged in"))
 
 
 
@@ -190,7 +190,7 @@ class AddSection(graphene.Mutation):
 			except Exception as e:
 				raise GraphQLError(e)
 		else:
-			raise GraphQLError(makJson("LOGIN", "You are not logged in"))
+			raise GraphQLError(makeJson("LOGIN", "You are not logged in"))
 
 
 
@@ -224,7 +224,7 @@ class AddHomework(graphene.Mutation):
 			except Exception as e:
 				raise GraphQLError(e)
 		else:
-			raise GraphQLError(makJson("LOGIN", "You are not logged in"))
+			raise GraphQLError(makeJson("LOGIN", "You are not logged in"))
 
 
 class DeleteHomework(graphene.Mutation):
@@ -253,7 +253,7 @@ class DeleteHomework(graphene.Mutation):
 			except Exception as e:
 				raise GraphQLError(e)
 		else:
-			raise GraphQLError(makJson("LOGIN", "You are not logged in"))
+			raise GraphQLError(makeJson("LOGIN", "You are not logged in"))
 
 
 
@@ -293,7 +293,7 @@ class UpdateHomework(graphene.Mutation):
 			except Exception as e:
 				raise GraphQLError(e)
 		else:
-			raise GraphQLError(makJson("LOGIN", "You are not logged in"))
+			raise GraphQLError(makeJson("LOGIN", "You are not logged in"))
 
 
 class AddExam(graphene.Mutation):
@@ -330,4 +330,59 @@ class AddExam(graphene.Mutation):
 			except Exception as e:
 				raise GraphQLError(e)
 		else:
-			raise GraphQLError(makJson("LOGIN", "You are not logged in"))
+			raise GraphQLError(makeJson("LOGIN", "You are not logged in"))
+
+
+
+class AddQuestions(graphene.Mutation):
+	class Arguments:
+		exam_id = graphene.ID()
+		exam_data = graphene.String()
+
+	ok = graphene.Boolean() 
+
+	def mutate(self, info, exam_id, exam_data):
+		user = info.context.user 
+		if user.is_authenticated:
+			try:
+				teacher = Teacher.objects.get(user=user)
+				exam = Exam.objects.get(pk=exam_id)
+				Teaching.objects.get(teacher=teacher, element=exam.section.element)
+				questions = json.loads(exam_data)
+				for question in questions:
+					question_id = question.get("id", 0)
+					type = QuestionType.objects.get(pk=int(question["type"]) )
+					mark = question.get("mark", 1)
+					choices = question.get("choices", [])
+					content = json.dumps(question.get("content", []) )
+					if type.type != "Plain text" and len(choices) == 0:
+						raise GraphQLError(makeJson("DATAERROR", "You must provide at least one choice"))
+					else:
+						if question_id:
+							question = Question.objects.get(pk=question_id)
+							question.content = content
+							question.mark = mark
+							question.type = type
+						else:
+							question = Question(content=content, mark=mark, type=type, exam=exam)
+						question.save()
+						for choice_ in choices:
+							choice_id = choice_.get("id", 0)
+							if choice_id:
+								choice = Choice.objects.get(pk=choice_id)
+								choice.content = choice_.get("content")
+								choice.is_correct = choice_.get("isCorrect", False)
+							else:
+								choice = Choice(question=question, content=choice_.get("content"), is_correct=choice_.get("isCorrect"))
+							choice.save()
+				return (AddQuestions(ok=True))
+			except Teacher.DoesNotExist:
+				raise GraphQLError(makeJson("PERMISSION", "You do not have the permission to perform this action"))
+			except Exam.DoesNotExist:
+				raise GraphQLError(makeJson("DATAERROR", "The provided exam is not valid"))
+			except Exam.DoesNotExist:
+				raise GraphQLError(makeJson("PERMISSION", "You are not allowed to perform this action"))
+			except Exception as e:
+				raise GraphQLError(e)
+		else:
+			raise GraphQLError(makeJson("LOGIN", "You are not logged in"))

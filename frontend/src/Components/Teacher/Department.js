@@ -32,6 +32,10 @@ const GET_LECTURES = gql`
           title 
           deadline
         }
+        exams {
+          id 
+          title
+        }
       }
     }
   }
@@ -53,7 +57,7 @@ function Lectures(){
         <>
           {
             sections.map((section, index) => {
-              if(!section.lectures.length && !section.homeworks.length) return null
+              if(!section.lectures.length && !section.homeworks.length && !section.exams.length) return null
               return <Section key={index} section={section} />
             })
           }

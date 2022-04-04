@@ -7,7 +7,7 @@ from graphql import GraphQLError
 import json
 
 from student.models import HomeworkFinished, LectureFinished, ElementLog
-from exam.models import QuestionType 
+from exam.models import QuestionType, Question, Choice, Exam
 
 import math
 
@@ -33,20 +33,19 @@ class DepartmentType(DjangoObjectType):
 class CustomStudentType(DjangoObjectType):
 	class Meta:
 		model = Student
-		fields = ("id",) 
-
+	id = graphene.ID()
 	full_name = graphene.String()
 	cin = graphene.String()
 	email = graphene.String()
 
 	def resolve_full_name(self, info):
 		return self.user.get_full_name()
-
 	def resolve_cin(self, info):
 		return self.user.cin
-
 	def resolve_email(self, info):
 		return self.user.email
+	def resolve_id(self, info):
+		return self.user.id
 
 
 class LectureType(DjangoObjectType):
@@ -97,7 +96,7 @@ class HomeworkType(DjangoObjectType):
 class SectionType(DjangoObjectType):
 	class Meta:
 		model = Section
-		fields = ("id", "element", "name", "lectures", "homeworks")
+		fields = ("id", "element", "name", "lectures", "homeworks", "exams")
 
 class ElementType(DjangoObjectType):
 	class Meta:
@@ -123,11 +122,35 @@ class ModuleType(DjangoObjectType):
 		model = Module
 		fields = ("name", "department", "id", "elements")
 
+class ExamType(DjangoObjectType):
+	class Meta:
+		model = Exam 
+		fields = "__all__"
+	duration = graphene.Int()
+	starts_at = graphene.String()
+	def resolve_duration(self, info):
+		return str(self.duration.seconds)
+	def resolve_starts_at(self, info):
+		return self.starts_at.strftime("%Y-%m-%d %H:%M")
+
 class QuestionTypeType(DjangoObjectType):
 	class Meta:
 		model = QuestionType
 		fields = ("id", "type")
 
+class ChoiceType(DjangoObjectType):
+	class Meta:
+		model = Choice 
+		fields = "__all__"
+
+class QuestionModelType(DjangoObjectType):
+	class Meta:
+		model = Question 
+		fields = ("id", "content", "mark", "choices")
+
+	type = graphene.Field(QuestionTypeType)
+	def resolve_type(self, info):
+		return self.type
 
 class TeacherQueries(graphene.ObjectType):
 	get_teachings = graphene.List(TeachingType)
@@ -137,12 +160,18 @@ class TeacherQueries(graphene.ObjectType):
 	lecture = graphene.Field(LectureType)
 	module = graphene.Field(ModuleType)
 	homework = graphene.Field(HomeworkType)
+	exam = graphene.Field(ExamType)
 	student = graphene.Field(CustomStudentType)
+	choice = graphene.Field(ChoiceType)
 
 	get_lecture_by_id = graphene.Field(LectureType, lecture_id=graphene.ID())
 	get_homework_by_id = graphene.Field(HomeworkType, homework_id=graphene.ID())
 
 	get_question_types = graphene.List(QuestionTypeType)
+
+	get_exam_questions = graphene.List(QuestionModelType, exam_id=graphene.ID())
+
+	get_exam_by_id = graphene.Field(ExamType, exam_id=graphene.ID())
 
 	def resolve_get_teachings(self, info):
 		user = info.context.user
@@ -216,5 +245,40 @@ class TeacherQueries(graphene.ObjectType):
 
 	def resolve_get_question_types(self, info):
 		return QuestionType.objects.all()
+
+	def resolve_get_exam_questions(self, info, exam_id):
+		user = info.context.user 
+		if user.is_authenticated:
+			try:
+				exam = Exam.objects.get(pk=exam_id)
+				teacher = Teacher.objects.get(user=user)
+				Teaching.objects.get(element=exam.section.element, teacher=teacher)
+				return Question.objects.filter(exam=exam)
+			except Exam.DoesNotExist:
+				raise GraphQLError(makeJson("DATAERROR", "The provided data is not valid"))
+			except Teacher.DoesNotExist:
+				raise GraphQLError(makeJson("PERMISSION", "You don't have the permission to see this content"))
+			except Teaching.DoesNotExist:
+				raise GraphQLError(makeJson("PERMISSION", "You don't have the permission to see this content"))
+		else :
+			raise GraphQLError(makeJson("LOGIN", "You are not logged in"))
+
+
+	def resolve_get_exam_by_id(self, info, exam_id):
+		user = info.context.user 
+		if user.is_authenticated:
+			try:
+				exam = Exam.objects.get(pk=exam_id)
+				teacher = Teacher.objects.get(user=user)
+				Teaching.objects.get(element=exam.section.element, teacher=teacher)
+				return exam
+			except Exam.DoesNotExist:
+				raise GraphQLError(makeJson("DATAERROR", "The provided data is not valid"))
+			except Teacher.DoesNotExist:
+				raise GraphQLError(makeJson("PERMISSION", "You don't have the permission to see this content"))
+			except Teaching.DoesNotExist:
+				raise GraphQLError(makeJson("PERMISSION", "You don't have the permission to see this content"))		
+		else :
+			raise GraphQLError(makeJson("LOGIN", "You are not logged in"))
 
 
