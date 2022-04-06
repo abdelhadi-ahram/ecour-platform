@@ -28,7 +28,7 @@ export default function RightPannel(props){
                 <Calender />
               </div>
 
-          </div>
+            </div>
         )
       }
 
