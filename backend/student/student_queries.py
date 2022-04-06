@@ -3,10 +3,12 @@ from graphene_django import DjangoObjectType
 from authentication.models import Department, Teacher, Student
 from department.models import (Teaching, Module, Section, Lecture, Element, Homework, StudentHomeworkAnswer)
 
+from exam.models import Exam, StudentAttempt
 from .models import Studying
 
 from graphql import GraphQLError
 import json
+from django.utils import timezone
 
 from .models import HomeworkFinished, LectureFinished
 
@@ -22,6 +24,10 @@ from department.teacher_queries import (
 	HomeworkAnswerType
 	)
 
+from student.models import ExamFinished
+
+from authentication.hash import Hasher
+
 def makeJson(type, text):
 	response = {
 		"type" : type,
@@ -29,14 +35,17 @@ def makeJson(type, text):
 	}
 	return json.dumps(response)
 
+
+
 class StudentType(DjangoObjectType):
 	class Meta:
 		model = Student 
-		fields = ("id","department") 
+		fields = ("department",) 
 
 	full_name = graphene.String()
 	cin = graphene.String()
 	email = graphene.String()
+	id = graphene.ID()
 
 	def resolve_full_name(self, info):
 		return self.user.get_full_name()
@@ -46,6 +55,8 @@ class StudentType(DjangoObjectType):
 
 	def resolve_email(self, info):
 		return self.user.email
+	def resolve_id(self, info):
+		return self.user.id
 
 
 class HomeworkStudentType(DjangoObjectType):
@@ -71,8 +82,8 @@ class HomeworkStudentType(DjangoObjectType):
 	def resolve_answer(self, info):
 		try:
 			student = Student.objects.get(user=info.context.user)
-			return StudentHomeworkAnswer.objects.filter(homework=self, student=student).first()
-		except Student.DoesNotExist:
+			return StudentHomeworkAnswer.objects.get(homework=self, student=student)
+		except :
 			return None
 
 class StudentLectureType(DjangoObjectType):
@@ -89,6 +100,73 @@ class StudentLectureType(DjangoObjectType):
 		except Student.DoesNotExist:
 			return False
 
+class StudentExamType(DjangoObjectType):
+	class Meta:
+		model = Exam 
+		fields = "__all__"
+
+	id = graphene.ID()
+	message = graphene.String()
+	is_open = graphene.Boolean()
+	is_finished = graphene.Boolean()
+	student_attempts = graphene.Int()
+
+	def resolve_id(self, info):
+		user = info.context.user 
+		if user.is_authenticated:
+			id = Hasher.encode("exam", self.id)
+			return id
+		else:
+			return None
+	def resolve_is_open(self, info):
+		now = timezone.now()
+		user = info.context.user 
+		if user.is_authenticated:
+			try:
+				student = Student.objects.get(user=user)
+				if StudentAttempt.objects.filter(student=student, exam=self).count() < self.attempts:
+					return (now >= self.starts_at and now < (self.starts_at + self.duration) ) 
+			except:
+				return False
+		return False
+	def resolve_message(self, info):
+		now = timezone.now()
+		if now < self.starts_at:
+			return "This exam won't open untill " + self.starts_at.strftime("%a, %m-%y %H:%M")
+		elif now > (self.starts_at + self.duration):
+			d = self.starts_at + self.duration
+			return "This exam was closed since " + d.strftime("%a, %m-%y %H:%M")
+		try:
+			student = Student.objects.get(user=info.context.user)
+			if StudentAttempt.objects.filter(student=student, exam=self).count() >= self.attempts:
+				return "You have already taken your attempts"
+		except:
+			raise GraphQLError(makeJson("PERMISSION", "You don't have the permission to access this content"))
+		return "This exam is currently open"
+
+	def resolve_is_finished(self, info):
+		user = info.context.user 
+		if user.is_authenticated:
+			try:
+				student = Student.objects.get(user=user)
+				return ExamFinished.objects.filter(student=student, exam=self).exists()
+			except:
+				return False
+		else :
+			return False
+
+	def resolve_student_attempts(self, info):
+		user = info.context.user 
+		if user.is_authenticated:
+			try:
+				student = Student.objects.get(user=user)
+				return StudentAttempt.objects.filter(exam=self, student=student).count()
+			except Exception as e:
+				raise GraphQLError(e)
+		else:
+			return 0
+
+
 class StudentQueries(graphene.ObjectType):
 	get_department_modules = graphene.List(ModuleType)
 	department = graphene.Field(DepartmentType)
@@ -102,7 +180,7 @@ class StudentQueries(graphene.ObjectType):
 
 	get_homework_content = graphene.Field(HomeworkStudentType, homework_id=graphene.ID())
 
-	# get_homework_answer = graphene.Field(HomeworkAnswerType, homework_id=graphene.ID())
+	get_exam_content = graphene.Field(StudentExamType, exam_id=graphene.ID())
 
 	def resolve_get_element_content(self,info, element_id):
 		user = info.context.user
@@ -174,6 +252,27 @@ class StudentQueries(graphene.ObjectType):
 			except Student.DoesNotExist:
 				raise GraphQLError(makeJson("PERMISSION", "You do not have the permission to see this content"))
 			except Homework.DoesNotExist:
+				raise GraphQLError(makeJson("DATAERROR", "The provided data is not valid"))
+
+		return GraphQLError(makeJson("LOGIN", "You are not logged in"))
+
+
+	def resolve_get_exam_content(self, info, exam_id):
+		user = info.context.user 
+		if user.is_authenticated:
+			try:
+				student = Student.objects.get(user=user)
+				department = student.department
+				decoded_id = Hasher.decode("exam", exam_id)
+				exam = Exam.objects.get(pk=decoded_id)
+				module = exam.section.element.module
+				is_valid = Studying.objects.get(department=department, module=module)
+				return exam
+			except Studying.DoesNotExist:
+				raise GraphQLError(makeJson("PERMISSION", "You do not have the permission to see this content"))
+			except Student.DoesNotExist:
+				raise GraphQLError(makeJson("PERMISSION", "You do not have the permission to see this content"))
+			except Exam.DoesNotExist:
 				raise GraphQLError(makeJson("DATAERROR", "The provided data is not valid"))
 
 		return GraphQLError(makeJson("LOGIN", "You are not logged in"))

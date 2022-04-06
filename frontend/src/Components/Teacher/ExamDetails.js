@@ -101,7 +101,7 @@ function ExamDetails(){
 					</p>
 				</div>
 				<div className="flex justify-end">
-					<button className="update-btn">Update</button>
+					<Link to={`/my/edit-exam/${examId}`}><button className="update-btn">Update</button></Link>
 				</div>
 			</div>
 

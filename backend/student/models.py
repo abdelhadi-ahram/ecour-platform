@@ -3,6 +3,8 @@ from django.db import models
 from authentication.models import Student, Department
 from department.models import Element, Lecture, Homework, Module
 
+from  exam.models import Exam
+
 class Studying(models.Model):
 	department = models.ForeignKey(Department, related_name="studyings", on_delete=models.CASCADE)
 	module = models.ForeignKey(Module, on_delete=models.CASCADE)
@@ -41,6 +43,21 @@ class HomeworkFinished(models.Model):
 
 	class Meta:
 		db_table = "homework_finished"
+
+
+class ExamFinished(models.Model):
+	student = models.ForeignKey(Student, on_delete=models.CASCADE)
+	exam = models.ForeignKey(Exam, on_delete=models.CASCADE)
+	created_at = models.DateTimeField(auto_now=True)
+
+	class Meta:
+		unique_together = ('student', 'exam',)
+
+	def __str__(self):
+		return str(self.student) + " finished " + str(self.exam)
+
+	class Meta:
+		db_table = "exam_finished"
 
 
 class ElementLog(models.Model):

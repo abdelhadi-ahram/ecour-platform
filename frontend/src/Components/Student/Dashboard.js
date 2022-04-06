@@ -42,7 +42,7 @@ const GET_ELEMENTS = gql`
 
 export default function Dashboard(){
 
-  const {data, loading, error} = useQuery(GET_ELEMENTS)
+  const {data, loading, error} = useQuery(GET_ELEMENTS, {fetchPolicy : "network-only"})
 
   if(error){
     return <b className="text-red-500 font-bold text-lg">Error occurred</b>

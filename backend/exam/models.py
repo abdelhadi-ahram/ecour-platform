@@ -53,7 +53,8 @@ class StudentAttempt(models.Model):
 	student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name="exam_attempts")
 	exam = models.ForeignKey(Exam, on_delete=models.CASCADE, related_name="student_attempts")
 	created_at = models.DateTimeField(auto_now=True)
-	finished_at = models.DateTimeField()
+	finished_at = models.DateTimeField(null=True)
+	mark = models.FloatField(null=True)
 	class Meta:
 		db_table = "student_attempt"
 

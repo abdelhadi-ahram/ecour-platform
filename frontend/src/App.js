@@ -4,6 +4,8 @@ import Login from './Components/Login';
 import Teacher from './Components/Teacher';
 import Student from './Components/Student';
 
+//https://dribbble.com/shots/17399694-Search-Results-Animationhttps://dribbble.com/shots/17399694-Search-Results-Animation
+
 import './index.css';
 
 import LoginRequired from "./LoginRequired"
@@ -23,8 +25,9 @@ function Announce(){
   const {data, error} = useQuery(gql`
     {
       getLoggedUser
-    }
-    `)
+    }`, {
+      fetchPolicy: "network-only"
+    })
 
     if(data) {
       return (
@@ -45,7 +48,9 @@ function AlreadyLoggedin(props){
     }
   `;
 
-  const {data, error} = useQuery(GET_LOGGED_USER)
+  const {data, error} = useQuery(GET_LOGGED_USER, {
+    fetchPolicy: "network-only"
+  })
 
   if(data){
     return <Navigate to="/my" replace />

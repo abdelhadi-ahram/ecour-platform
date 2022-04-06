@@ -23,6 +23,8 @@ function getType(type){
 			return <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
 		case "homework":
 			return <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg>
+		case 'exam':
+			return <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
 		default :
 			return <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
 	}
@@ -47,14 +49,19 @@ const GET_ELEMENT_CONTENT = gql`
 	        title
 	        isFinished
 	      }
+	      exams {
+	      	id 
+	      	title 
+	      	isFinished
+	      }
 	    }
 	  }
 	}
 `;
 
 const TOGGLE_LECTURE_FINISHED = gql`
-	mutation ToggleLectureFinished($lectureId:ID, $homeworkId: ID){
-		toggleLectureFinished(lectureId: $lectureId, homeworkId: $homeworkId){
+	mutation ToggleLectureFinished($lectureId:ID, $homeworkId: ID, $examId: ID){
+		toggleLectureFinished(lectureId: $lectureId, homeworkId: $homeworkId, examId: $examId){
 			ok
 		}
 	}
@@ -72,19 +79,30 @@ function Lecture({item, type}){
 
 	function toggle(){
 		const variables = {}
-		type == "homework" ? variables.homeworkId = item.id : variables.lectureId = item.id
+		switch(type){
+			case "homework":
+				variables.homeworkId = item.id
+				break
+			case "exam":
+				variables.examId = item.id
+				break
+			default:
+				variables.lectureId = item.id
+				break
+		}
+		//type == "homework" ? variables.homeworkId = item.id : (type == "exam" ? variables.examId = item.id : variables.lectureId = item.id)
 		toggleLectureFinished({variables})
 	}
 
 	return(
-		<div className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 cursor-pointer">
+		<div className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 dark:hover:bg-zinc-700 cursor-pointer">
 			<div onClick={() => {}}  className="flex space-x-2 ">
 				<span className="text-gray-400">{getType(item.type || type)}</span>
 				<Link to={`/my/${type || "lecture"}/${item.id}`}>
-					<p className="text-gray-600">{item.title}</p>
+					<p className="text-gray-600 dark:text-gray-400">{item.title}</p>
 				</Link>
 			</div>
-            <div onClick={toggle} className={`${item.isFinished ? "text-green-500" : "text-gray-400 hover:text-gray-600"} ${loading ? "animate-spin" : ""}`}>
+            <div onClick={toggle} className={`${item.isFinished ? "text-green-500" : "text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"} ${loading ? "animate-spin" : ""}`}>
 	            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
             </div>
 		</div>
@@ -96,7 +114,7 @@ function Section({section}){
 	return(
 		<div className="space-y-2 rounded">
 			<div>
-				<p className="text-gray-900 font-semibold text-md">{section.name}</p>
+				<p className="text-gray-900 dark:text-gray-200 font-semibold text-md">{section.name}</p>
 			</div>
 			<div className="flex flex-col space-y-2">
 				{section.lectures.map((item, index) => {
@@ -107,6 +125,11 @@ function Section({section}){
 				{section.homeworks.map((item, index) => {
 					return (
 						<Lecture type="homework" item={item} key={index} />
+					)
+				})}
+				{section.exams.map((item, index) => {
+					return (
+						<Lecture type="exam" item={item} key={index} />
 					)
 				})}
 			</div>
@@ -130,20 +153,36 @@ export default function Courses(){
 
 	return(
 		<div className="flex flex-col space-y-3">
-			<div className="w-full rounded-xl py-2 px-4 bg-white">
-				<p className="text-gray-700 font-semibold">{data?.getElementContent.name}</p>
+			<div className="w-full rounded-xl py-2 px-4 bg-white dark:bg-zinc-800">
+				<div className="flex items-center space-x-2">
+					<Link to={`/my`}>
+						<p className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 ">Home</p>
+					</Link> 
+					<span className="dark:text-gray-400">/</span>
+					<p className="text-gray-700 dark:text-gray-300">
+						{data?.getElementContent.name}
+					</p>
+				</div>
 			</div>
-			<div className="w-full bg-white rounded-xl px-3 py-2 rounded shadow p-1">
+			<div className="w-full bg-white dark:bg-zinc-800 rounded-xl px-3 py-2 rounded shadow p-1">
 
 
 				<div className="flex flex-col space-y-8 p-2">
 					{data?.getElementContent.sections.map((item, index) => {
-						return (
+						return emptySection(item) ?
+						 (
 							<Section key={index} section={item} />
 						)
+						:
+						null
 					})}
 				</div>
 			</div>
 		</div>
 	)
+}
+
+
+function emptySection(section){
+	return (section.exams.length && section.lectures.length && section.homeworks.length)
 }

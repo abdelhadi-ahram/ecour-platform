@@ -1,6 +1,6 @@
 import graphene
 from graphene_django import DjangoObjectType
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login, authenticate, logout
 from authentication.models import User, Student, Teacher
 
 from graphql import GraphQLError
@@ -24,6 +24,7 @@ class UserType(DjangoObjectType):
 class UserQuery(graphene.ObjectType):
     authenticate_user = graphene.Field(UserType, email=graphene.String(), password=graphene.String())
     get_logged_user = graphene.Field(UserType)
+    logout = graphene.Boolean()
 
     def resolve_authenticate_user(self, info, email, password):
         user = authenticate(email=email, password=password)
@@ -36,4 +37,8 @@ class UserQuery(graphene.ObjectType):
         if info.context.user.is_authenticated:
             return info.context.user
         raise GraphQLError("You are not logged in")
+
+    def resolve_logout(self, info):
+        logout(info.context)
+        return True
 

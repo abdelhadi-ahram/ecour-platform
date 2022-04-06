@@ -2,10 +2,14 @@ from graphene_file_upload.scalars import Upload
 from department.models import StudentHomeworkAnswer, Section, Lecture, Element, Homework
 import graphene
 from authentication.models import Student
-from .models import Studying, LectureFinished, HomeworkFinished
+from .models import Studying, LectureFinished, HomeworkFinished, ExamFinished
+
+from exam.models import Exam, StudentAttempt
 
 from graphql import GraphQLError
 from .student_queries import makeJson
+
+from authentication.hash import Hasher
 
 class AddHomeworkAnswer(graphene.Mutation):
 	class Arguments:
@@ -42,6 +46,7 @@ class ToggleLectureFinished(graphene.Mutation):
 	class Arguments:
 		lecture_id = graphene.ID(required=False)
 		homework_id = graphene.ID(required=False)
+		exam_id = graphene.ID(required=False)
 
 	ok = graphene.Boolean()
 
@@ -61,7 +66,15 @@ class ToggleLectureFinished(graphene.Mutation):
 		except HomeworkFinished.DoesNotExist:
 			homework = HomeworkFinished(student=student, homework=homework).save()
 
-	def mutate(self, info, lecture_id=None, homework_id=None):
+	@staticmethod
+	def toggle_exam_finished(student, exam):
+		try:
+			exam = ExamFinished.objects.get(student=student, exam=exam)
+			exam.delete()
+		except ExamFinished.DoesNotExist:
+			exam = ExamFinished(student=student, exam=exam).save()
+
+	def mutate(self, info, lecture_id=None, homework_id=None, exam_id=None):
 		user = info.context.user
 		if user.is_authenticated:
 			try:
@@ -77,12 +90,50 @@ class ToggleLectureFinished(graphene.Mutation):
 					ToggleLectureFinished.toggle_homework_finished(student, homework)
 					return ToggleLectureFinished(ok=True)
 
+				if exam_id:
+					exam = Exam.objects.get(pk=exam_id)
+					ToggleLectureFinished.toggle_exam_finished(student, exam)
+					return ToggleLectureFinished(ok=True)
+
 			except Homework.DoesNotExist:
 				raise GraphQLError(makeJson("DATAERROR","The given homework is not valid"))
 			except Lecture.DoesNotExist:
 				raise GraphQLError(makeJson("DATAERROR","The given lecture is not valid"))
 			except Student.DoesNotExist:
 				raise GraphQLError(makeJson("PERMISSION","You do do not have the permission"))
+
+		else:
+			raise GraphQLError(makeJson("LOGIN","You are nt logged in"))
+
+
+class CreateAttempt(graphene.Mutation):
+	class Arguments:
+		exam_id = graphene.ID()
+	
+	attempt_id = graphene.ID()
+
+	def mutate(self, info, exam_id):
+		user = info.context.user
+		if user.is_authenticated:
+			try:
+				decoded_id = Hasher.decode("exam", exam_id)
+				exam = Exam.objects.get(pk=decoded_id)
+				student = Student.objects.get(user=user)
+				Studying.objects.get(department=student.department, module=exam.section.element.module)
+				#check if a user has valid attempt
+				student_attempts = StudentAttempt.objects.filter(student=student, exam=exam).count()
+				if student_attempts < exam.attempts:
+					attempt = StudentAttempt(student=student, exam=exam)
+					attempt.save()
+					attempt_id = Hasher.encode(user.cin, attempt.id)
+					return CreateAttempt(attempt_id=attempt_id)
+				raise GraphQLError(makeJson("PERMISSION","You do not have the permission for an attempt"))
+			except Exam.DoesNotExist:
+				raise GraphQLError(makeJson("DATAERROR","The given section is not valid"))
+			except Student.DoesNotExist:
+				raise GraphQLError(makeJson("PERMISSION","You do do not have the permission"))
+			except Studying.DoesNotExist:
+				raise GraphQLError(makeJson("PERMISSION","You don't have the right to perform this action"))
 
 		else:
 			raise GraphQLError(makeJson("LOGIN","You are nt logged in"))

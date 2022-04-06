@@ -6,6 +6,8 @@ import ElementDetails from './ElementDetails';
 import Dashboard from './Dashboard';
 import LectureDetails from "./LectureDetails"
 import HomeworkDetails from "./HomeworkDetails"
+import Exam from './Exam'
+import ExamAttempt from "./ExamAttempt"
 
 import Buttons from './studentsButtons';
 import '../../index.css';
@@ -23,16 +25,16 @@ export default function Student() {
           </Sidebar>
         </div>
          <div className="w-full h-screen">
-          <RightPanel >
 
             <Routes>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/element/:elementId" element={<ElementDetails />} />
-              <Route path="/lecture/:lectureId" element={<LectureDetails />} />
-              <Route path="/homework/:homeworkId" element={<HomeworkDetails />} />
+              <Route path="/" element={<RightPanel ><Dashboard /></RightPanel >} />
+              <Route path="/element/:elementId" element={<RightPanel ><ElementDetails /></RightPanel >} />
+              <Route path="/lecture/:lectureId" element={<RightPanel ><LectureDetails /></RightPanel >} />
+              <Route path="/homework/:homeworkId" element={<RightPanel ><HomeworkDetails /></RightPanel >} />
+              <Route path="/exam/:examId" element={<RightPanel ><Exam /></RightPanel >} />
+              <Route path="/attempt/:attemptId" element={<RightPanel withoutCalendar ><ExamAttempt /></RightPanel >} />
             </Routes>
 
-          </RightPanel>
       </div>
 
       </div>

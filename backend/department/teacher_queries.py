@@ -6,7 +6,7 @@ from department.models import (Teaching, Module, Section, Lecture, Element, Home
 from graphql import GraphQLError
 import json
 
-from student.models import HomeworkFinished, LectureFinished, ElementLog
+from student.models import HomeworkFinished, LectureFinished, ElementLog, ExamFinished
 from exam.models import QuestionType, Question, Choice, Exam
 
 import math
@@ -128,6 +128,7 @@ class ExamType(DjangoObjectType):
 		fields = "__all__"
 	duration = graphene.Int()
 	starts_at = graphene.String()
+	
 	def resolve_duration(self, info):
 		return str(self.duration.seconds)
 	def resolve_starts_at(self, info):
