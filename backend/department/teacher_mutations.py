@@ -320,7 +320,8 @@ class AddExam(graphene.Mutation):
 
 					exam = Exam(title=title, description=description, starts_at=starts_at, duration=delta_duration, section=section, sequentiel=sequentiel, attempts=attempts)
 					exam.save()
-					return AddExam(id=exam.id)
+					encoded_id = Hasher.encode("exam", exam.id)
+					return AddExam(id=encoded_id)
 				else:
 					raise GraphQLError(makeJson("PERMISSION", "You do not have the right to perform this action"))
 			except Teaching.DoesNotExist:
@@ -346,7 +347,8 @@ class AddQuestions(graphene.Mutation):
 		if user.is_authenticated:
 			try:
 				teacher = Teacher.objects.get(user=user)
-				exam = Exam.objects.get(pk=exam_id)
+				decoded_exam_id = Hasher.decode("exam", exam_id)
+				exam = Exam.objects.get(pk=decoded_exam_id)
 				Teaching.objects.get(teacher=teacher, element=exam.section.element)
 				questions = json.loads(exam_data)
 				for question in questions:
@@ -359,7 +361,8 @@ class AddQuestions(graphene.Mutation):
 						raise GraphQLError(makeJson("DATAERROR", "You must provide at least one choice"))
 					else:
 						if question_id:
-							question = Question.objects.get(pk=question_id)
+							decoded_question_id = Hasher.decode("question", question_id)
+							question = Question.objects.get(pk=decoded_question_id)
 							question.content = content
 							question.mark = mark
 							question.type = type
@@ -369,7 +372,8 @@ class AddQuestions(graphene.Mutation):
 						for choice_ in choices:
 							choice_id = choice_.get("id", 0)
 							if choice_id:
-								choice = Choice.objects.get(pk=choice_id)
+								decoded_choice_id = Hasher.decode("choice", choice_id)
+								choice = Choice.objects.get(pk=decoded_choice_id)
 								choice.content = choice_.get("content")
 								choice.is_correct = choice_.get("isCorrect", False)
 							else:

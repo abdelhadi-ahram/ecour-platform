@@ -6,7 +6,7 @@ import Calender from "./Calender"
 export default function RightPannel(props){
   const [selected, setSelected] = React.useState(0)
   return(
-    <div className="w-full h-screen overflow-y-auto pt-8 pr-8 flex flex-col">
+    <div className="w-full h-screen overflow-y-auto pt-4 pr-8 flex flex-col">
         <div className="w-[1/2] justify-center">
           <TopBar />
         </div>

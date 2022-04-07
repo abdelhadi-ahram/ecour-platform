@@ -8,6 +8,7 @@ import json
 
 from student.models import HomeworkFinished, LectureFinished, ElementLog, ExamFinished
 from exam.models import QuestionType, Question, Choice, Exam
+from authentication.hash import Hasher
 
 import math
 
@@ -147,7 +148,12 @@ class ChoiceType(DjangoObjectType):
 class QuestionModelType(DjangoObjectType):
 	class Meta:
 		model = Question 
-		fields = ("id", "content", "mark", "choices")
+		fields = ("content", "mark", "choices")
+
+	id = graphene.ID()
+	def resolve_id(self, info):
+		encoded_id = Hasher.encode("question", self.id)
+		return encoded_id
 
 	type = graphene.Field(QuestionTypeType)
 	def resolve_type(self, info):
@@ -251,7 +257,8 @@ class TeacherQueries(graphene.ObjectType):
 		user = info.context.user 
 		if user.is_authenticated:
 			try:
-				exam = Exam.objects.get(pk=exam_id)
+				decoded_id = Hasher.decode("exam", exam_id)
+				exam = Exam.objects.get(pk=decoded_id)
 				teacher = Teacher.objects.get(user=user)
 				Teaching.objects.get(element=exam.section.element, teacher=teacher)
 				return Question.objects.filter(exam=exam)
@@ -269,7 +276,8 @@ class TeacherQueries(graphene.ObjectType):
 		user = info.context.user 
 		if user.is_authenticated:
 			try:
-				exam = Exam.objects.get(pk=exam_id)
+				decoded_exam_id = Hasher.decode("exam", exam_id)
+				exam = Exam.objects.get(pk=decoded_exam_id)
 				teacher = Teacher.objects.get(user=user)
 				Teaching.objects.get(element=exam.section.element, teacher=teacher)
 				return exam

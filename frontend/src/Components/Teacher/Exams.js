@@ -33,7 +33,7 @@ const DELETE_HOMEWORK = gql`
   }
 `;
 
-function Homeworks({exams}){
+function Exam({exams}){
   const [deleteHomeworkId, setDeleteHomeworkId] = React.useState(0)
 
   const navigate = useNavigate()
@@ -87,4 +87,4 @@ function Homeworks({exams}){
 }
 
 
-export default Homeworks;
+export default Exam;

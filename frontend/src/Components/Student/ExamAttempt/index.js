@@ -5,7 +5,7 @@ import {
 } from "@apollo/client"
 
 import {
-  useParams
+  useParams, useNavigate
 } from "react-router-dom"
 
 import moment from "moment"
@@ -14,6 +14,7 @@ const GET_ATTEMPT_DETAILS = gql`
 query GetAttemptDetails($attemptId: ID!){
   getAttemptDetails(attemptId: $attemptId){
     leftTime
+    sequentiel
     questions {
       id
     }
@@ -23,10 +24,12 @@ query GetAttemptDetails($attemptId: ID!){
 
 function ExamAttempt(){
   const {attemptId} = useParams()
-  const [questions, setQuestions] = React.useState(null)
+  const [questions, setQuestions] = React.useState([])
   const [selected, setSelected] = React.useState(0)
   const [leftTime, setLeftTime] = React.useState(0)
   const {data, error, loading} = useQuery(GET_ATTEMPT_DETAILS, {variables : {attemptId}})
+
+  const navigate = useNavigate()
 
   React.useEffect(() => {
     if(data){
@@ -39,18 +42,55 @@ function ExamAttempt(){
 
   React.useEffect(() => {
     if(leftTime)
-      setTimeout(()=> setLeftTime(leftTime - 1), 1000)
+      if(leftTime > 0)
+        setTimeout(()=> setLeftTime(leftTime - 1), 1000)
   }, [leftTime])
 
+  React.useEffect(() => {
+    var hidden = "hidden";
+    window.addEventListener('blur', onchange)
+     // Standards:
+      if (hidden in document)
+        document.addEventListener("visibilitychange", onchange);
+      else if ((hidden = "mozHidden") in document)
+        document.addEventListener("mozvisibilitychange", onchange);
+      else if ((hidden = "webkitHidden") in document)
+        document.addEventListener("webkitvisibilitychange", onchange);
+      else if ((hidden = "msHidden") in document)
+        document.addEventListener("msvisibilitychange", onchange);
+      // IE 9 and lower:
+      else if ("onfocusin" in document)
+        document.onfocusout = onchange;
+      // All others:
+      else
+        window.onpageshow = window.onpagehide = onchange;
+
+      function onchange(e){
+        //console.log(e)
+      }
+
+      window.addEventListener('popstate', (event) => {
+        //console.log("location: " + document.location + ", state: " + JSON.stringify(event.state));
+      });
+
+  }, [])
+
+  function fetchNext(){
+    if(selected <= questions.length - 1){
+      setSelected(selected + 1)
+    }
+  }
+
+  if(error){
+    return <b className="text-red-500">{JSON.parse(error.message).text}</b>
+  }
+
 	return(
-		<div className=" px-1 flex space-x-1 grow overflow-y-hidden">
+		<div className=" px-1 flex space-x-3 grow overflow-y-hidden">
           <div className="w-3/4 shrink overflow-y-auto pr-2 bg-zinc-800 flex flex-col rounded-md">
             <div className="w-full h-2 bg-gray-100 dark:bg-zinc-800 blur sticky top-0"></div>
-            <div className="flex-1" >
-              <Question />
-            </div>
-            <div className="flex items-center justify-end p-2">
-              <button className="post-btn">Next</button>
+            <div className="flex-1 grow flex flex-col overflow-y-auto" >
+              <Question question={questions[selected]?.id} fetchNext={fetchNext} />
             </div>
           </div>
 
@@ -64,7 +104,9 @@ function ExamAttempt(){
               <div className="grid grid-cols-3 gap-3 p-2">
                 {
                   questions?.map((question, index) => {
-                    return <div key={index} className="p-2 text-gray-300 flex flex-col items-center justify-center border border-zinc-600 bg-zinc-700 rounded-lg">{index}</div>
+                    const isSelected = selected == index
+                    const sequentiel = data.getAttemptDetails.sequentiel
+                    return <button disabled={sequentiel} key={index} className={`p-[4px] flex flex-col items-center justify-center border rounded-lg ${isSelected ? "border-indigo-400 text-indigo-500 bg-zinc-700" : "text-gray-300 border-zinc-600"} disabled:cursor-not-allowed`}>{index}</button>
                   })
                 }
               </div>

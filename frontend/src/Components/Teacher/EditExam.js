@@ -48,13 +48,13 @@ function QuestionTypes({onChange, selectedItem}){
 			</div>
 			<div className="relative mt-[1px]">
 				<Transition show={isShown}
-              enter="transform transition duration-[400ms]"
-              enterFrom="scale-y-0"
-              enterTo="scale-y-100"
-              leave="transform transition duration-[400ms]"
-              leaveFrom="scale-y-100"
-              leaveTo="scale-y-0"
-            >
+	              enter="transform transition duration-[400ms]"
+	              enterFrom="scale-y-0"
+	              enterTo="scale-y-100"
+	              leave="transform transition duration-[400ms]"
+	              leaveFrom="scale-y-100"
+	              leaveTo="scale-y-0"
+            	>
 					<div className="absolute z-40 shadow-lg top-0 left-0 w-full bg-zinc-700 rounded-md">
 							{
 								data?.getQuestionTypes.map((item, index) => (
@@ -253,17 +253,17 @@ function EditExam(){
 					<div className="flex-1 overflow-y-auto flex flex-col space-y-2">
 						<div className="w-full bg-zinc-800 py-2 px-3 rounded-md flex flex-col space-y-3">
 							<Transition show={dataError.error}
-		              enter="transform transition duration-[400ms]"
-		              enterFrom="scale-y-0"
-		              enterTo="scale-y-100"
-		              leave="transform transition duration-[400ms]"
-		              leaveFrom="scale-y-100"
-		              leaveTo="scale-y-0"
-		            >
-		            <p className="rounded-md bg-zinc-700 px-3 py-2 border border-red-400 text-red-400">
-		            	{dataError.message}
-		            </p>
-              </Transition>
+				              enter="transform transition duration-[400ms]"
+				              enterFrom="scale-y-0"
+				              enterTo="scale-y-100"
+				              leave="transform transition duration-[400ms]"
+				              leaveFrom="scale-y-100"
+				              leaveTo="scale-y-0"
+				            >
+					            <p className="rounded-md bg-zinc-700 px-3 py-2 border border-red-400 text-red-400">
+					            	{dataError.message}
+					            </p>
+			              </Transition>
 								<div className="flex justify-between">
 										<div className="flex justify-between space-x-3">
 												<div className="flex flex-col space-y-1">
