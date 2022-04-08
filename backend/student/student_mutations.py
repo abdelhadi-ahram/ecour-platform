@@ -161,7 +161,7 @@ class SaveStudentAnswer(graphene.Mutation):
 				decoded_question_id = Hasher.decode(user.cin, question_id)
 				question = Question.objects.get(pk=decoded_question_id)
 
-				if question.exam.sequentiel && not StudentQuestionAnswer.objects.filter(attempt=attempt, question=question).exists():
+				if question.exam.sequentiel and not StudentQuestionAnswer.objects.filter(attempt=attempt, question=question).exists():
 					student_question = StudentQuestionAnswer(attempt=attempt, question=question)
 					student_question.save()
 					if question.type.type != "Plain text":
