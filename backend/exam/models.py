@@ -64,17 +64,16 @@ class StudentAttempt(models.Model):
 	class Meta:
 		db_table = "student_attempt"
 
-class StudentQuestion(models.Model):
-	student_attempt = models.ForeignKey(StudentAttempt, related_name="answers", on_delete=models.CASCADE)
+class StudentQuestionAnswer(models.Model):
+	attempt = models.ForeignKey(StudentAttempt, related_name="answers", on_delete=models.CASCADE)
 	question = models.ForeignKey(Question, on_delete=models.CASCADE)
 	content = models.TextField(null=True)
 	class Meta:
-		db_table = "student_question"
+		db_table = "student_question_answer"
 
-class StudentAnswer(models.Model):
-	student_question = models.ForeignKey(StudentQuestion, on_delete=models.CASCADE, related_name="answers")
+class StudentPickedChoice(models.Model):
+	student_question = models.ForeignKey(StudentQuestionAnswer, on_delete=models.CASCADE, related_name="picked_choices")
 	choice = models.ForeignKey(Choice, on_delete=models.CASCADE)
-	content = models.TextField(null=True)
 
 	class Meta:
-		db_table = "student_answer"
+		db_table = "student_picked_choice"

@@ -42,3 +42,20 @@ class UserQuery(graphene.ObjectType):
         logout(info.context)
         return True
 
+
+def makeJson(type, text):
+    response = {
+        "type" : type,
+        "text" : text
+    }
+    return json.dumps(response)
+    
+def require_auth(fun):
+    def inner(obj, info, **kwargs):
+        user = info.context.user 
+        if user.is_authenticated:
+            return fun(obj, info, **kwargs)
+        raise GraphQLError(makeJson("LOGIN", "You are not logged in"))
+
+    return inner
+

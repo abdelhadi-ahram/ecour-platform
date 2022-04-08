@@ -41,9 +41,12 @@ function ExamAttempt(){
   var timer = null;
 
   React.useEffect(() => {
+    var timer;
     if(leftTime)
       if(leftTime > 0)
-        setTimeout(()=> setLeftTime(leftTime - 1), 1000)
+        timer = setTimeout(()=> setLeftTime(leftTime - 1), 1000)
+
+    return () => clearTimeout(timer)
   }, [leftTime])
 
   React.useEffect(() => {
@@ -76,7 +79,7 @@ function ExamAttempt(){
   }, [])
 
   function fetchNext(){
-    if(selected <= questions.length - 1){
+    if(selected < questions.length - 1){
       setSelected(selected + 1)
     }
   }
@@ -87,18 +90,18 @@ function ExamAttempt(){
 
 	return(
 		<div className=" px-1 flex space-x-3 grow overflow-y-hidden">
-          <div className="w-3/4 shrink overflow-y-auto pr-2 bg-zinc-800 flex flex-col rounded-md">
+          <div className="w-3/4 shrink overflow-y-auto pr-2 bg-white dark:bg-zinc-800 flex flex-col rounded-md">
             <div className="w-full h-2 bg-gray-100 dark:bg-zinc-800 blur sticky top-0"></div>
             <div className="flex-1 grow flex flex-col overflow-y-auto" >
-              <Question question={questions[selected]?.id} fetchNext={fetchNext} />
+              {questions[selected] && <Question question={questions[selected]?.id} fetchNext={fetchNext} />}
             </div>
           </div>
 
 
-          <div className="w-1/4 rounded-lg p-1 grow-0 bg-zinc-800 flex flex-col">
-            <div className="rounded mx-2 my-2 py-1 border border-zinc-700 flex items-center justify-center space-x-2">
+          <div className="w-1/4 rounded-lg p-1 grow-0 bg-white dark:bg-zinc-800 flex flex-col">
+            <div className="rounded mx-2 my-2 py-1 border border-gray-300 dark:border-zinc-700 flex items-center justify-center space-x-2">
               <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-              <p className={` font-semibold ${leftTime < 30 ? "text-red-400" : "text-gray-300"}`}>{moment.utc(leftTime*1000).format("HH:mm:ss")}</p>
+              <p className={` font-semibold ${leftTime < 30 ? "text-red-400" : "text-gray-600 dark:text-gray-300"}`}>{moment.utc(leftTime*1000).format("HH:mm:ss")}</p>
             </div>
             <div className="flex-1">
               <div className="grid grid-cols-3 gap-3 p-2">
@@ -106,13 +109,13 @@ function ExamAttempt(){
                   questions?.map((question, index) => {
                     const isSelected = selected == index
                     const sequentiel = data.getAttemptDetails.sequentiel
-                    return <button disabled={sequentiel} key={index} className={`p-[4px] flex flex-col items-center justify-center border rounded-lg ${isSelected ? "border-indigo-400 text-indigo-500 bg-zinc-700" : "text-gray-300 border-zinc-600"} disabled:cursor-not-allowed`}>{index}</button>
+                    return <button disabled={sequentiel} key={index} className={`p-[4px] flex flex-col items-center justify-center border rounded-lg ${isSelected ? "border-indigo-400 text-indigo-500 bg-blue-50 dark:bg-zinc-700" : "text-gray-600 dark:text-gray-300 border-gray-300 dark:border-zinc-600"} disabled:cursor-not-allowed`}>{index}</button>
                   })
                 }
               </div>
             </div>
             <div className="flex flex-col items-center p-2 justify-center">
-              <button className="update-btn">Finish the exam</button>
+              <button className="update-btn border border-green-300 dark:border-zinc-600 font-semibold">Finish the exam</button>
             </div>
           </div>
 

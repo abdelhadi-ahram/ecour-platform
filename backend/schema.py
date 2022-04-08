@@ -3,7 +3,7 @@ from graphql import GraphQLError
 
 from graphene_django import DjangoObjectType
 
-from department.teacher_mutations import (
+from teacher.teacher_mutations import (
     AddLectureText,
     AddLectureFile, 
     UpdateLecture, 
@@ -17,9 +17,9 @@ from department.teacher_mutations import (
     )
 
 from authentication.user_queries import UserQuery
-from department.teacher_queries import TeacherQueries
+from teacher.teacher_queries import TeacherQueries
 from student.student_queries import StudentQueries
-from student.student_mutations import AddHomeworkAnswer, ToggleLectureFinished, CreateAttempt
+from student.student_mutations import AddHomeworkAnswer, ToggleLectureFinished, CreateAttempt, SaveStudentAnswer
 from exam.exam_queries import StudentExamQueries
 
 class Query(StudentExamQueries, TeacherQueries, UserQuery, StudentQueries, graphene.ObjectType):
@@ -41,5 +41,6 @@ class Mutations(graphene.ObjectType):
     add_exam = AddExam.Field()
     add_questions = AddQuestions.Field()
     create_attempt = CreateAttempt.Field()
+    save_student_answer = SaveStudentAnswer.Field()
 
 schema = graphene.Schema(query=Query, mutation=Mutations)

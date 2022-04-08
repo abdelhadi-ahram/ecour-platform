@@ -54,12 +54,25 @@ class User(AbstractBaseUser):
 	def get_short_name(self):
 		return self.first_name
 
+	def is_teacher(self):
+		return self.get_role() == "teacher"
+
+	def is_student(self):
+		return self.get_role() == "student"
+
+	def get_role(self):
+		if hasattr(self, "teacher"):
+			return 'teacher'
+		elif hasattr(self, "student"):
+			return "student"
+		return None
+
 	class Meta:
 		db_table = "user"
 
 
 class Teacher(models.Model):
-	user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
+	user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True, related_name="teacher")
 
 	def __str__(self):
 		str = self.user.get_full_name()
@@ -82,7 +95,7 @@ class Department(models.Model):
 		db_table = "department"
 
 class Student(models.Model):
-	user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
+	user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True, related_name="student")
 	department = models.ForeignKey(Department, on_delete=models.CASCADE)
 
 	def __str__(self):

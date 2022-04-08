@@ -1,11 +1,12 @@
 
 from graphene_file_upload.scalars import Upload
 import graphene
-from .models import Section, Teaching, Lecture, Element, Homework
+from department.models import Section, Teaching, Lecture, Element, Homework
 from authentication.models import Teacher
 from exam.models import (Exam, QuestionType, Choice, Question)
 
 from graphql import GraphQLError
+from authentication.hash import Hasher
 
 import json
 import datetime

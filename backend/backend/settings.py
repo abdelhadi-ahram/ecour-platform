@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'authentication',
     'department',
     'student',
+    'teacher',
     'exam',
     'corsheaders'
 ]

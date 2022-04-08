@@ -9,8 +9,26 @@ import json
 from student.models import HomeworkFinished, LectureFinished, ElementLog, ExamFinished
 from exam.models import QuestionType, Question, Choice, Exam
 from authentication.hash import Hasher
-
 import math
+
+from department.types import (
+	TeachingType,
+	DepartmentType,
+	LectureType,
+	HomeworkAnswerType,
+	HomeworkType,
+	SectionType,
+	ElementType,
+	ModuleType,
+	CustomStudentType
+)
+
+from exam.types import (
+	QuestionModelType,
+	ExamType,
+	ChoiceType,
+	QuestionTypeType
+)
 
 def makeJson(type, text):
 	response = {
@@ -19,145 +37,7 @@ def makeJson(type, text):
 	}
 	return json.dumps(response)
 
-class TeachingType(DjangoObjectType):
-    class Meta:
-        model = Teaching
-        fields = ("id", "department")
 
-    # is_responsible = graphene.String()
-class DepartmentType(DjangoObjectType):
-	class Meta:
-		model = Department
-		fields = ("id", "name")
-
-
-class CustomStudentType(DjangoObjectType):
-	class Meta:
-		model = Student
-	id = graphene.ID()
-	full_name = graphene.String()
-	cin = graphene.String()
-	email = graphene.String()
-
-	def resolve_full_name(self, info):
-		return self.user.get_full_name()
-	def resolve_cin(self, info):
-		return self.user.cin
-	def resolve_email(self, info):
-		return self.user.email
-	def resolve_id(self, info):
-		return self.user.id
-
-
-class LectureType(DjangoObjectType):
-	class Meta:
-		model = Lecture
-		fields = "__all__"
-
-	seen = graphene.Int()
-	accessed_by = graphene.List(CustomStudentType)
-
-	def resolve_seen(self, info):
-		return ElementLog.objects.filter(lecture=self).count()
-
-	def resolve_accessed_by(self, info):
-		qr = ElementLog.objects.filter(lecture=self)
-		students = []
-		for q in qr:
-			students.append(q.student)
-		return set(students)
-
-class HomeworkAnswerType(DjangoObjectType):
-	class Meta:
-		model = StudentHomeworkAnswer
-		fields = "__all__"
-
-	created_at = graphene.String()
-	def resolve_created_at(self, info):
-		return self.created_at.strftime("%a, %m-%y %H:%M")
-
-class HomeworkType(DjangoObjectType):
-	class Meta:
-		model = Homework 
-		fields = "__all__"
-
-	deadline_date = graphene.String()
-	def resolve_deadline_date(self, info):
-		return self.deadline.strftime("%Y-%m-%d")
-
-	deadline_time = graphene.String()
-	def resolve_deadline_time(self, info):
-		return self.deadline.strftime("%H:%M")
-
-	student_answers = graphene.List(HomeworkAnswerType)
-	def resolve_student_answers(self, info):
-		return StudentHomeworkAnswer.objects.filter(homework=self)
-
-
-class SectionType(DjangoObjectType):
-	class Meta:
-		model = Section
-		fields = ("id", "element", "name", "lectures", "homeworks", "exams")
-
-class ElementType(DjangoObjectType):
-	class Meta:
-		model = Element
-		fields = ("id", "module","name","sections")
-
-	progress = graphene.Float()
-
-	def resolve_progress(self, info):
-		user = info.context.user 
-		try:
-			student = Student.objects.get(user=user) 
-			elements = Lecture.objects.filter(section__element=self).count() + Homework.objects.filter(section__element=self).count()
-			done = LectureFinished.objects.filter(lecture__section__element=self, student=student).count() + HomeworkFinished.objects.filter(homework__section__element=self, student=student).count()
-			if(elements):
-				return math.floor((done / elements) * 100)
-			return 0
-		except :
-			return 0
-
-class ModuleType(DjangoObjectType):
-	class Meta:
-		model = Module
-		fields = ("name", "department", "id", "elements")
-
-class ExamType(DjangoObjectType):
-	class Meta:
-		model = Exam 
-		fields = "__all__"
-	duration = graphene.Int()
-	starts_at = graphene.String()
-	
-	def resolve_duration(self, info):
-		return str(self.duration.seconds)
-	def resolve_starts_at(self, info):
-		return self.starts_at.strftime("%Y-%m-%d %H:%M")
-
-class QuestionTypeType(DjangoObjectType):
-	class Meta:
-		model = QuestionType
-		fields = ("id", "type")
-
-class ChoiceType(DjangoObjectType):
-	class Meta:
-		model = Choice 
-		fields = "__all__"
-
-class QuestionModelType(DjangoObjectType):
-	class Meta:
-		model = Question 
-		fields = ("content", "mark", "choices")
-
-	id = graphene.ID()
-	def resolve_id(self, info):
-		encoded_id = Hasher.encode("question", self.id)
-		return encoded_id
-
-	type = graphene.Field(QuestionTypeType)
-	def resolve_type(self, info):
-		return self.type
 
 class TeacherQueries(graphene.ObjectType):
 	get_teachings = graphene.List(TeachingType)

@@ -1,35 +1,27 @@
 import React from "react"
 
-const generateChoicesForm = (type) => {
-	if (type === "Multi choice") return []
-	return ""
-}
 
-function Choices({choices, type}){
-	const [selected, setSelected] = React.useState(null);
-	React.useEffect(() => {
-		setSelected(generateChoicesForm(type))
-	}, [type])
+function Choices({choices, selectedChoices, setSelectedChoices}){
 
 	function selectChoice(choiceId){
-		if (typeof selected == 'string'){
-			setSelected(choiceId)
+		if (typeof selectedChoices == 'string'){
+			setSelectedChoices(choiceId)
 		} else{
-			let choices = []
-			if(selected.includes(choiceId)){
-				choices = selected.filter(item => {return item != choiceId})
+			let currentChoices = []
+			if(selectedChoices.includes(choiceId)){
+				currentChoices = selectedChoices.filter(item => {return item != choiceId})
 			} else {
-				choices = [...selected, choiceId]
+				currentChoices = [...selectedChoices, choiceId]
 			}
-			setSelected(choices)
+			setSelectedChoices(currentChoices)
 		}
 	}
 
 	function isChoiceSelected(choiceId){
-		if (typeof selected == 'string'){
-			return choiceId == selected
+		if (typeof selectedChoices == 'string'){
+			return choiceId == selectedChoices
 		} else{
-			return selected.includes(choiceId)
+			return selectedChoices.includes(choiceId)
 		}
 	}
 

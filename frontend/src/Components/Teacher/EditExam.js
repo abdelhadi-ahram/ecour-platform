@@ -1,5 +1,5 @@
 import React from "react";
-import TextEditor from "../Editor"
+import TextEditor, {initialValue} from "../Editor"
 import {Transition} from "@headlessui/react"
 
 import {
@@ -38,6 +38,7 @@ function QuestionTypes({onChange, selectedItem}){
 		}
 	}, [selectedItem])
 
+
 	return (
 		<div className="flex flex-col w-40">
 			<div className="p-[5px] px-2 rounded-md border dark:border-zinc-600 dark:text-gray-300 flex justify-between" onClick={() => setIsShown(!isShown)}>
@@ -70,23 +71,12 @@ function QuestionTypes({onChange, selectedItem}){
 
 function getQuestionProto(){
 	return {
-		content : getInitialValue(),
+		content : initialValue,
 		id: null,
 		type: {},
 		mark: 0,
 		choices : []
 	}
-}
-
-function getInitialValue(){
-	return ([
-				  	{
-					    type: "paragraph",
-					    children: [
-					      { text: "" },
-					    ]
-					  }
-					])
 }
 
 
@@ -123,6 +113,8 @@ function EditExam(){
 	const {examId} = useParams()
 	const [questions, setQuestions] = React.useState([getQuestionProto()])
 	const [selected, setSelected] = React.useState(0)
+	const [dataError, setDataError] = React.useState({error: false, message: ""})
+	var resetValue = () => {};
 
 	const [editorValue, setEditorValue] = React.useState([{
 		...getQuestionProto(),
@@ -132,15 +124,38 @@ function EditExam(){
 	const [sendQuestions , sendQuestionsData] = useMutation(ADD_QUESTIONS, {
 		onError : error => {
 			console.log(error)
-			/*const customError = JSON.parse(error.message)
-			if(customError.type != "LOGIN") setDataError({error:true, message: customError.message})
-			else navigate("/login")*/
 		}
 	})
 
 	const {data, error, loading} = useQuery(GET_EXAM_QUESTIONS, {variables : {examId}})
 
-	const [dataError, setDataError] = React.useState({error: false, message: ""})
+
+	//if an error occurred
+	React.useEffect(() => {
+		if(dataError.error) setTimeout(() => setDataError({error: false, message: ""}), 5000)
+	}, [dataError])
+
+	React.useEffect(() => {
+		resetValue(questions[selected].content)
+	}, [selected])
+
+	//if data is changed
+	React.useEffect(() => {
+		if(data){
+			const questionsData = data.getExamQuestions.map(item => {
+				return {
+					mark: item.mark,
+					type: item.type, 
+					id: item.id, 
+					content: JSON.parse(item.content),
+					choices: item.choices.map(choice => {return {isCorrect: choice.isCorrect, content: choice.content, id: choice.id} })
+				}})
+			if(questionsData.length)
+				setQuestions([...questionsData])
+			else 
+				setQuestions([getQuestionProto()])
+		} 
+	}, [data])
 
 	function addChoice(e){
 		if (e.keyCode === 13) {
@@ -154,7 +169,6 @@ function EditExam(){
 	  }
 	}
 
-	var restValueTo = () => {};
 
 	function setQuestionContent(value){
 		const selectedQuestion = questions[selected];
@@ -218,29 +232,6 @@ function EditExam(){
 		//console.log(questionsData)
 	}
 
-	//if an error occurred
-	React.useEffect(() => {
-		if(dataError.error) setTimeout(() => setDataError({error: false, message: ""}), 5000)
-	}, [dataError])
-
-	//if data is changed
-	React.useEffect(() => {
-		if(data){
-			const questionsData = data.getExamQuestions.map(item => {
-				return {
-					mark: item.mark,
-					type: item.type, 
-					id: item.id, 
-					content: JSON.parse(item.content),
-					choices: item.choices.map(choice => {return {isCorrect: choice.isCorrect, content: choice.content, id: choice.id} })
-				}})
-			if(questionsData.length)
-				setQuestions([...questionsData])
-			else 
-				setQuestions([getQuestionProto()])
-		} 
-	}, [data])
-
 
 	return(
 		<>
@@ -285,7 +276,7 @@ function EditExam(){
 
 								<div className="flex flex-col space-y-2">
 									<p className="text-gray-400 font-semibold">Question</p>
-									<TextEditor height="100px" value={questions[selected].content} setValue={setQuestionContent} />
+									<TextEditor resetValue={(fun) => resetValue = fun} maxHeight="100px" value={questions[selected].content} setValue={setQuestionContent} />
 								</div>
 						</div>
 

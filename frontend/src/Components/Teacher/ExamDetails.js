@@ -30,7 +30,6 @@ const GET_EXAM_BY_ID = gql`
 		      }
 		    }
 		    questions {
-		      id
 		      content
 		      mark
 		      type{

@@ -4,12 +4,15 @@ import graphene
 from authentication.models import Student
 from .models import Studying, LectureFinished, HomeworkFinished, ExamFinished
 
-from exam.models import Exam, StudentAttempt
+from exam.models import Exam, Question, StudentAttempt, StudentQuestionAnswer, StudentPickedChoice
 
 from graphql import GraphQLError
 from .student_queries import makeJson
 
 from authentication.hash import Hasher
+from authentication.user_queries import require_auth
+
+import json
 
 class AddHomeworkAnswer(graphene.Mutation):
 	class Arguments:
@@ -137,3 +140,45 @@ class CreateAttempt(graphene.Mutation):
 
 		else:
 			raise GraphQLError(makeJson("LOGIN","You are nt logged in"))
+
+
+class SaveStudentAnswer(graphene.Mutation):
+	class Arguments:
+		attempt_id = graphene.ID()
+		question_id = graphene.ID()
+		content = graphene.String() 
+
+	ok = graphene.Boolean()
+	next_question = graphene.String()
+
+	@require_auth
+	def mutate(self, info, attempt_id, question_id, content):
+		user = info.context.user 
+		if user.is_student():
+			try:
+				decoded_attempt_id = Hasher.decode(user.cin, attempt_id)
+				attempt = StudentAttempt.objects.get(pk=decoded_attempt_id)
+				decoded_question_id = Hasher.decode(user.cin, question_id)
+				question = Question.objects.get(pk=decoded_question_id)
+
+				if question.exam.sequentiel && not StudentQuestionAnswer.objects.filter(attempt=attempt, question=question).exists():
+					student_question = StudentQuestionAnswer(attempt=attempt, question=question)
+					student_question.save()
+					if question.type.type != "Plain text":
+						answers = json.loads(content)
+						for answer in answers:
+							decoded_choice_id = Hasher.decode(user.cin, answer)
+							choice = Choice.objects.get(pk=decoded_choice_id)
+							spc = StudentPickedChoice(student_question=student_question, choice=choice)
+							spc.save()
+						return SaveStudentAnswer(ok=True, next_question="Answer has been created successfully")
+					else:
+						student_question.content = content
+						student_question.save()
+						return SaveStudentAnswer(ok=True, next_question="hquestion saved with value f{content}")
+
+				return SaveStudentAnswer(ok=False, next_question="hello world")
+			except Exception as e:
+				# raise GraphQLError(makeJson("DATAERROR", "The provided data is not valid"))
+				raise GraphQLError(e)
+		raise GraphQLError(makeJson("PERMISSION", "You do not have the permission to perform this action"))
