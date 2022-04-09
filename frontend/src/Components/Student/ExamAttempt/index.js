@@ -52,7 +52,7 @@ function ExamAttempt(){
   React.useEffect(() => {
     window.addEventListener("beforeunload", (event) => {
       event.preventDefault()
-      return console.log("hello world")
+      return "Are you sure you want to finish this exam?"
     })
     /*var hidden = "hidden";
     window.addEventListener('blur', onchange)
@@ -80,7 +80,7 @@ function ExamAttempt(){
         //console.log("location: " + document.location + ", state: " + JSON.stringify(event.state));
       });*/
 
-  })
+  }, [])
 
   function fetchNext(){
     if(selected < questions.length - 1){

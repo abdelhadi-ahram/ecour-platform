@@ -2,15 +2,32 @@ import React from 'react';
 import Logout from "./Dialog/Logout"
 import {Transition} from '@headlessui/react'
 
-import {makeVar, useReactiveVar} from "@apollo/client"
+import {
+  makeVar, useReactiveVar, useQuery, gql
+} from "@apollo/client"
+import {
+  Link
+} from "react-router-dom"
 
 export const showSidebar = makeVar(false)
 
+
+const GET_LOGGED_USER = gql`
+    {
+      getLoggedUser{
+        firstName 
+        role
+        isAuthenticated
+      }
+    }
+  `;
 
 export default function Sidebar(props){
   const [selected,setSelected]= React.useState(0);
   const [showLogout,setShowLogout]= React.useState(false);
   const isSideBarShown = useReactiveVar(showSidebar)
+
+  const {data, error} = useQuery(GET_LOGGED_USER)
 
   function hideLogout(){
     setShowLogout(false)
@@ -43,9 +60,18 @@ export default function Sidebar(props){
               })}
           </div>
 
-          <div className="p-2 rounded-xl text-gray-400 dark:text-gray-600 hover:text-red-400 hover:bg-red-100 dark:hover:bg-zinc-700 dark:hover:text-red-500" onClick={() => {setShowLogout(true)}}>
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
-          </div>
+          { data?.getLoggedUser.isAuthenticated ? (
+            <div className="p-2 rounded-xl text-gray-400 dark:text-gray-600 hover:text-red-400 hover:bg-red-100 dark:hover:bg-zinc-700 dark:hover:text-red-500" onClick={() => {setShowLogout(true)}}>
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+            </div>
+            ) : (
+              <Link to='/login'>
+                <div className="p-2 rounded-xl text-gray-400 dark:text-gray-600 hover:text-red-400 hover:bg-red-100 dark:hover:bg-zinc-700 dark:hover:text-red-500">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" /></svg>
+                </div>
+              </Link>
+            )
+          }
         </div>
       </div>
 
@@ -85,10 +111,20 @@ export default function Sidebar(props){
               })}
             </div>
 
-            <div onClick={logoutFromSmallScreen} className="cursor-pointer flex items-center space-x-3 p-2 rounded-xl text-gray-400 dark:text-gray-600 hover:text-red-400 hover:bg-red-100 dark:hover:bg-zinc-700 dark:hover:text-red-500" >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
-              <p className="text-gray-400 text-lg">Logout</p>
-            </div>
+            { data?.getLoggedUser.isAuthenticated ? (
+                <div onClick={logoutFromSmallScreen} className="cursor-pointer flex items-center space-x-3 p-2 rounded-xl text-gray-400 dark:text-gray-600 hover:text-red-400 hover:bg-red-100 dark:hover:bg-zinc-700 dark:hover:text-red-500" >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+                  <p className="text-gray-400 text-lg">Logout</p>
+                </div>
+              ) : (
+                <Link to="/login">
+                  <div className="cursor-pointer flex items-center space-x-3 p-2 rounded-xl text-gray-400 dark:text-gray-600 hover:text-red-400 hover:bg-red-100 dark:hover:bg-zinc-700 dark:hover:text-red-500" >
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+                    <p className="text-gray-400 text-lg">Login</p>
+                  </div>
+                </Link>
+              )}
+
           </div>
       </div>
     </Transition>

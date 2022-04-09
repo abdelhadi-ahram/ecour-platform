@@ -21,6 +21,7 @@ function LoginRequired(props){
       getLoggedUser {
         firstName
         role
+        isAuthenticated
       }
     }
   `;

@@ -1,5 +1,4 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import Sidebar from '../Sidebar';
 import RightPanel from '../RightPannel';
 import Dashboard from './Dashboard';

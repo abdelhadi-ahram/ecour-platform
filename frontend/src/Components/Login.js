@@ -13,6 +13,7 @@ const AUTHENTICATE_USER = gql`
   query AuthenticateUser($email:String!, $password:String!){
     authenticateUser(email: $email, password: $password){
       firstName
+      isAuthenticated
     }
   }
 `
@@ -42,10 +43,10 @@ export default function Login() {
   React.useEffect(() => {
     console.log(data)
     if(data){
-      if(data.authenticateUser)
+      if(data.authenticateUser.is_authenticated)
         navigate("/my")
     }
-  })
+  }, [data])
 
   return(
     <div className="bg-gray-100 dark:bg-zinc-900 flex justify-center items-center content-center w-screen h-screen" >

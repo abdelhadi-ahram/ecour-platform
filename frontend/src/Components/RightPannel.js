@@ -4,7 +4,7 @@ import Calender from "./Calender"
 
 
 export default function RightPannel(props){
-  const [selected, setSelected] = React.useState(0)
+
   return(
     <div className="w-full h-screen overflow-y-auto px-3 lg:px-0 lg:pr-8 flex flex-col">
         <div className="lg:w-[1/2] bg-gray-100 dark:bg-zinc-900 pt-4 pb-2 sticky top-0 lg:justify-center">

@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import Login from './Components/Login';
 import Teacher from './Components/Teacher';
 import Student from './Components/Student';
+import LandingPage from './Components/LandingPage'
 
 //https://dribbble.com/shots/17399694-Search-Results-Animationhttps://dribbble.com/shots/17399694-Search-Results-Animation
 
@@ -21,36 +22,18 @@ import {
 } from "@apollo/client"
 
 
-function Announce(){
-  const {data, error} = useQuery(gql`
-    {
-      getLoggedUser
-    }`, {
-      fetchPolicy: "network-only"
-    })
-
-    if(data) {
-      return (
-      <b>{data.getLoggedUser}
-      </b>)
-    }
-
-    return <LoadingPage />
-}
-
 function AlreadyLoggedin(props){
   const GET_LOGGED_USER = gql`
     {
       getLoggedUser{
         firstName 
         role
+        isAuthenticated
       }
     }
   `;
 
-  const {data, error} = useQuery(GET_LOGGED_USER, {
-    fetchPolicy: "network-only"
-  })
+  const {data, error} = useQuery(GET_LOGGED_USER)
 
   if(data){
     return <Navigate to="/my" replace />
@@ -64,10 +47,10 @@ function AlreadyLoggedin(props){
 export default function App() {
     return(
       <Routes>
-        <Route exact path="/" element={<Announce />} />
+        <Route exact path="/" element={<LandingPage />} />
         <Route path="/my/*" element={<LoginRequired></LoginRequired>}></Route>
         <Route path="/login" element={<AlreadyLoggedin><Login /></AlreadyLoggedin>} />
-        <Route path="*" element={<Navigate to="/my" replace />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     )
 }

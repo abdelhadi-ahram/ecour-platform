@@ -56,7 +56,7 @@ function Question({question, fetchNext}){
 	const [content, setContent] = React.useState(initialValue)
 	var resetValue = () => {}
 
-	//const [postQuestion, postResult] = useMutation(SAVE_QUESTION)
+	const [saveQuestionAnswer, saveQuestionResponse] = useMutation(SAVE_QUESTION)
 
 	const {data, error, loading} = useQuery(GET_QUESTION_CONTENT, {
 		variables : {questionId, attemptId},
@@ -69,9 +69,11 @@ function Question({question, fetchNext}){
 
 	React.useEffect(() => {
 		setQuestionId(question)
-		console.log(question)
-		console.log(attemptId)
 	}, [question])
+
+	React.useEffect(() => {
+		fetchNext()
+	}, [saveQuestionResponse.data])
 
 	if (loading) return <LoadingQuestion />
 	if(error) {
@@ -84,17 +86,17 @@ function Question({question, fetchNext}){
 	}
 
 	function saveQuestion(){
-		const answer = {question : questionId, attempt : attemptId}
+		const answer = {questionId , attemptId}
 		if(data?.getQuestionContent.type.type == "Plain text"){
 			answer.content = JSON.stringify(content)
 		} else{
 			if(typeof selectedChoices == "string"){
-				answer.choices = JSON.stringify([selectedChoices])
+				answer.content = JSON.stringify([selectedChoices])
 			} else {
-				answer.choices = JSON.stringify([...selectedChoices])
+				answer.content = JSON.stringify([...selectedChoices])
 			}
 		}
-		console.log(answer)
+		saveQuestionAnswer({variables : answer})
 	}
 
 	return(

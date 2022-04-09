@@ -12,6 +12,7 @@ class UserType(DjangoObjectType):
         fields = ("first_name", "cin")
 
     role = graphene.String()
+    is_authenticated = graphene.Boolean()
 
     def resolve_role(self, info):
         if Student.objects.filter(user=self).exists():
@@ -19,6 +20,8 @@ class UserType(DjangoObjectType):
         elif Teacher.objects.filter(user=self).exists():
             return "teacher"
         return "None"
+    def resolve_is_authenticated(self, info):
+        return self.is_authenticated
 
 
 class UserQuery(graphene.ObjectType):
