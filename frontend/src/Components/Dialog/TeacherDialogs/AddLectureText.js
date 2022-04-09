@@ -41,10 +41,12 @@ function AddLectureText(){
     navigate("/my")
   }
 
+  function resetValue(){}
+
   return (
     <div className="fixed inset-0 z-20 flex flex-col items-center justify-center">
       <div className="bg-black opacity-20 dark:opacity-40 fixed inset-0  z-0"></div>
-      <div className="w-[800px] p-6 rounded-xl bg-white dark:bg-zinc-800 z-10 flex flex-col items-center justify-center space-y-1">
+      <div className="w-[92%] lg:w-[800px] p-6 rounded-xl bg-white dark:bg-zinc-800 z-10 flex flex-col items-center justify-center space-y-1">
         <div className="w-full flex flex-col space-y-4">
             <div className="flex flex-col space-y-1">
               <p className="text-gray-600 dark:text-gray-400 font-semibold">Title</p>
@@ -53,7 +55,7 @@ function AddLectureText(){
 
             <div className="flex flex-col space-y-1">
               <p className="text-gray-600 dark:text-gray-400 font-semibold">Content</p>
-              <TextEditor height="200px" value={input} setValue={setInput} />
+              <TextEditor resetValue={(fun) => {resetValue = fun}} height="200px" value={input} setValue={setInput} />
             </div>
 
             <div className="flex items-center justify-end">

@@ -5,6 +5,7 @@ from department.models import (Teaching, Module, Section, Lecture, Element, Home
 
 from graphql import GraphQLError
 import json
+import math
 
 from student.models import HomeworkFinished, LectureFinished, ElementLog, ExamFinished
 from exam.models import QuestionType, Question, Choice, Exam
@@ -132,11 +133,11 @@ class ElementType(DjangoObjectType):
 				student = info.context.user.student
 				elements = Lecture.objects.filter(section__element=self).count() + Homework.objects.filter(section__element=self).count()
 				done = LectureFinished.objects.filter(lecture__section__element=self, student=student).count() + HomeworkFinished.objects.filter(homework__section__element=self, student=student).count()
-				if(elements):
+				if elements != 0:
 					return math.floor((done / elements) * 100)
 				return 0
 			except :
-				return 0
+				return -1
 		return 0
 
 class ModuleType(DjangoObjectType):

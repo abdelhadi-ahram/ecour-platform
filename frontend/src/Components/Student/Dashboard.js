@@ -52,10 +52,10 @@ export default function Dashboard(){
     <div className="flex flex-col space-y-4">
       <div className="flex flex-col space-y-2 bg-white dark:bg-zinc-800 p-4 rounded-lg">
         <p className="text-md font-semibold text-gray-700 dark:text-gray-200">Last accessed courses</p>
-        <div className="flex flex-row space-x-4">
+        <div className="flex flex-col space-y-2 lg:space-y-0 lg:flex-row lg:space-x-4">
           {LastCourses.map((item, index) => {
               return(
-                <div className="w-1/3">
+                <div className="lg:w-1/3">
                   <Card item={item} key={index} index={index} />
                 </div>
               )
@@ -66,12 +66,12 @@ export default function Dashboard(){
     		<div className=" w-full space-y-4 p-4 rounded-lg bg-white dark:bg-zinc-800 shadow p-1">
           <div className="flex justify-between">
             <h2 className="text-gray-700 dark:text-gray-200 font-semibold">Courses Progress</h2>
-            <div className="flex items-center justify-center space-x-3 px-4 py-1 rounded-lg border border-gray-200 dark:border-zinc-700">
+            <div className="flex items-center justify-center space-x-3 px-4 py-1 rounded-lg border border-gray-200 dark:border-zinc-700 cursor-pointer hover:border-gray-400">
               <p className="text-gray-700 dark:text-gray-200">Filter by</p>
               <svg className="w-6 h-6 text-gray-400 dark:border-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" /></svg>
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="flex flex-col space-y-2 md:grid md:grid-cols-2 md:gap-4">
           {
             (data?.getDepartmentModules.map((module_, index) => {
               const moduleName = module_.name

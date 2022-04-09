@@ -4,7 +4,14 @@ import graphene
 from authentication.models import Student
 from .models import Studying, LectureFinished, HomeworkFinished, ExamFinished
 
-from exam.models import Exam, Question, StudentAttempt, StudentQuestionAnswer, StudentPickedChoice
+from exam.models import (
+	Exam,
+	Question,
+	StudentAttempt,
+	StudentQuestionAnswer,
+	StudentPickedChoice,
+	Choice
+ )
 
 from graphql import GraphQLError
 from .student_queries import makeJson
@@ -156,28 +163,39 @@ class SaveStudentAnswer(graphene.Mutation):
 		user = info.context.user 
 		if user.is_student():
 			try:
+				# we get the question and the student attempt from the database
 				decoded_attempt_id = Hasher.decode(user.cin, attempt_id)
 				attempt = StudentAttempt.objects.get(pk=decoded_attempt_id)
 				decoded_question_id = Hasher.decode(user.cin, question_id)
 				question = Question.objects.get(pk=decoded_question_id)
 
-				if question.exam.sequentiel and not StudentQuestionAnswer.objects.filter(attempt=attempt, question=question).exists():
+				# check if the user has not already answered this question before 
+				# if it is a sequentiel exam
+				if not StudentQuestionAnswer.objects.filter(attempt=attempt, question=question).exists():
 					student_question = StudentQuestionAnswer(attempt=attempt, question=question)
 					student_question.save()
+					# if the type of the exam is not plain text 
+					# then we will loop on answers and register them in the database
 					if question.type.type != "Plain text":
 						answers = json.loads(content)
+						# if the question is a single question then we must make sure that we only store on choice
+						if question.type.type != "Single choice" and len(answers) > 1:
+							return SaveStudentAnswer(ok=False, next_question="You must provide one choice at most")
 						for answer in answers:
 							decoded_choice_id = Hasher.decode(user.cin, answer)
 							choice = Choice.objects.get(pk=decoded_choice_id)
 							spc = StudentPickedChoice(student_question=student_question, choice=choice)
 							spc.save()
 						return SaveStudentAnswer(ok=True, next_question="Answer has been created successfully")
+					# if the question type is plain text then we will add the content to the question
 					else:
 						student_question.content = content
 						student_question.save()
-						return SaveStudentAnswer(ok=True, next_question="hquestion saved with value f{content}")
+						return SaveStudentAnswer(ok=True, next_question="the question saved with value f{content}")
 
-				return SaveStudentAnswer(ok=False, next_question="hello world")
+				return SaveStudentAnswer(ok=False, next_question="The question answer is already exists")
+			except StudentAttempt.DoesNotExist:
+				raise GraphQLError("Student attempt does not exists")
 			except Exception as e:
 				# raise GraphQLError(makeJson("DATAERROR", "The provided data is not valid"))
 				raise GraphQLError(e)

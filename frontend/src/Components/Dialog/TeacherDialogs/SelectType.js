@@ -14,7 +14,7 @@ function SelectType(){
   return (
     <div className="fixed inset-0 z-20 flex flex-col items-center justify-center">
       <div className="bg-black opacity-20 dark:opacity-30 fixed inset-0  z-0" onClick={cancelClicked}></div>
-      <div className="w-[400px] p-6 rounded-xl bg-white dark:bg-zinc-800 z-10 flex flex-col items-center justify-center space-y-1">
+      <div className="w-[92%] sm:w-[400px] p-6 rounded-xl bg-white dark:bg-zinc-800 z-10 flex flex-col items-center justify-center space-y-1">
         <div className="w-full flex flex-col space-y-2">
           <div className="flex justify-between items-center">
             <p className="text-gray-700 dark:text-gray-300 font-bold text-md">Select a type</p>

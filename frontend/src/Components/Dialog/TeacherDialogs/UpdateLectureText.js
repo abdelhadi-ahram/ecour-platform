@@ -71,10 +71,12 @@ function UpdateLectureText({onCancel}){
     setInput(content)
   }, [data])
 
+  function resetValue(){}
+
   return (
     <div className="fixed inset-0 z-20 flex flex-col items-center justify-center">
       <div className="bg-black opacity-20 dark:opacity-40 fixed inset-0  z-0"></div>
-      <div className="w-[800px] p-6 rounded-xl bg-white dark:bg-zinc-800 z-10 flex flex-col items-center justify-center space-y-1">
+      <div className="w-[92%] lg:w-[800px] p-6 rounded-xl bg-white dark:bg-zinc-800 z-10 flex flex-col items-center justify-center space-y-1">
         <div className="w-full flex flex-col space-y-4">
             <div className="flex flex-col space-y-1">
               <p className="text-gray-600 dark:text-gray-300 font-semibold">Title</p>
@@ -83,7 +85,7 @@ function UpdateLectureText({onCancel}){
 
             <div className="flex flex-col space-y-1">
               <p className="text-gray-600 dark:text-gray-300 font-semibold">Content</p>
-              {input ? (<TextEditor height="150px" value={input} setValue={setInput} />) : (<PulseSquare width="full" height="[200px]" />)}
+              {input ? (<TextEditor resetValue={(fun) => {resetValue = fun}} height="150px" value={input} setValue={setInput} />) : (<PulseSquare width="full" height="[200px]" />)}
             </div>
 
             <div className="flex items-center justify-end">

@@ -87,7 +87,7 @@ function UpdateLectureFile({onCancel}){
   return (
     <div className="fixed inset-0 z-20 flex flex-col items-center justify-center">
       <div className="bg-black opacity-20 dark:opacity-40 fixed inset-0 z-0"></div>
-      <div className="w-[400px] p-6 rounded-xl bg-white dark:bg-zinc-800 z-10 flex flex-col items-center justify-center space-y-1">
+      <div className="w-[92%] sm:w-[400px] p-6 rounded-xl bg-white dark:bg-zinc-800 z-10 flex flex-col items-center justify-center space-y-1">
         <div className="w-full flex flex-col space-y-4">
             {updateLectureResponse.error && <p className="w-full p-2 rounded-lg bg-red-50 text-red-500">An error has been occurred, please try again</p>}
             <div className="flex flex-col space-y-1">

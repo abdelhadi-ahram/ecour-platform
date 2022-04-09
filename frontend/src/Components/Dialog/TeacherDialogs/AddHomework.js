@@ -58,10 +58,12 @@ function AddHomework(){
 		navigate("/my")
 	}
 
+	function resetValue(){}
+
 	return(
 		<div className="fixed inset-0 z-20 flex flex-col items-center justify-center">
 	      <div className="bg-black opacity-20 dark:opacity-40 fixed inset-0  z-0"></div>
-	      <div className="w-[800px] p-6 rounded-xl bg-white dark:bg-zinc-800 z-10 flex flex-col items-center justify-center space-y-1">
+	      <div className="w-[92%] lg:w-[800px] p-6 rounded-xl bg-white dark:bg-zinc-800 z-10 flex flex-col items-center justify-center space-y-1">
 	        <div className="w-full flex flex-col space-y-4">
 	        	<div className="w-full flex justify-between items-center space-x-4">
 	            <div className="flex flex-col space-y-1 w-full">
@@ -98,7 +100,7 @@ function AddHomework(){
 		              				<p className="text-gray-600 dark:text-gray-400 text-lg font-semibold">Drag and drop a file right here!</p>
 		              			</div>
 		              		}
-		              		<TextEditor height="120px" value={input} setValue={setInput} />
+		              		<TextEditor resetValue={(fun) => {resetValue = fun}} height="120px" value={input} setValue={setInput} />
 		              	</div>
 		              </Drag>
 		            </div>

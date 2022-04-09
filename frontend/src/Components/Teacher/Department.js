@@ -99,7 +99,7 @@ function Departments(){
 
 	return(
 		<div className="flex flex-col space-y-3 flex-1">
-      <div className="py-1 sticky top-0 bg-gray-100 dark:bg-zinc-900">
+      <div className="py-1 md:sticky md:top-0 bg-gray-100 dark:bg-zinc-900">
     		<div className="rounded-xl bg-white dark:bg-zinc-800 flex overflow-hidden shadow p-1">
         {
           data?.getTeachings.map((teaching, index) => {

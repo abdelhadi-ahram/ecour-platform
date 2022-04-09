@@ -49,7 +49,7 @@ export default function Login() {
 
   return(
     <div className="bg-gray-100 dark:bg-zinc-900 flex justify-center items-center content-center w-screen h-screen" >
-      <div className="w-[400px]">
+      <div className="w-[92%] sm:w-[400px]">
         <div className="bg-white dark:bg-zinc-800 shadow-md rounded-2xl px-11 py-14">
         {
           /*if the user left the inputs empty*/

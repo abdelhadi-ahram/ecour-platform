@@ -75,7 +75,7 @@ class StudentExamQueries(graphene.ObjectType):
 				decoded_attempt_id = Hasher.decode(user.cin, attempt_id)
 				attempt = StudentAttempt.objects.get(pk=decoded_attempt_id)
 				if attempt.student == student:
-					if StudentQuestionAnswer.objects.filter(attempt=attempt, question=question).exists():
+					if attempt.exam.sequentiel and StudentQuestionAnswer.objects.filter(attempt=attempt, question=question).exists():
 						raise GraphQLError(makeJson("PERMISSION", "You have already answered this question"))
 					return question
 				raise GraphQLError(makeJson("PERMISSION", "You don'thave the permission to access this content"))

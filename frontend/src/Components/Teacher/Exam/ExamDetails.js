@@ -1,6 +1,6 @@
 import React from "react";
-import Serializer from "../Editor/Serializer";
-import UpdateHomework from "../Dialog/TeacherDialogs/UpdateHomework"
+import Serializer from "../../Editor/Serializer";
+import UpdateHomework from "../../Dialog/TeacherDialogs/UpdateHomework"
 import moment from "moment"
 
 import {
@@ -11,7 +11,7 @@ import {
 	useQuery, gql
 } from "@apollo/client"
 
-import {LoadingPage} from "../Loadings"
+import {LoadingPage} from "../../Loadings"
 
 const GET_EXAM_BY_ID = gql`
 	query GetExamById($examId: ID!){

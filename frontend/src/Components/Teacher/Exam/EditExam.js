@@ -1,5 +1,5 @@
 import React from "react";
-import TextEditor, {initialValue} from "../Editor"
+import TextEditor, {initialValue} from "../../Editor"
 import {Transition} from "@headlessui/react"
 
 import {
@@ -117,8 +117,7 @@ function EditExam(){
 	var resetValue = () => {};
 
 	const [editorValue, setEditorValue] = React.useState([{
-		...getQuestionProto(),
-		editor : (<TextEditor height="100px" value={questions[selected].content} setValue={setQuestionContent} />)
+		...getQuestionProto()
 	}])
 
 	const [sendQuestions , sendQuestionsData] = useMutation(ADD_QUESTIONS, {

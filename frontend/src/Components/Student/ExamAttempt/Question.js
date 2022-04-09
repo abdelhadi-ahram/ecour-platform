@@ -59,7 +59,8 @@ function Question({question, fetchNext}){
 	//const [postQuestion, postResult] = useMutation(SAVE_QUESTION)
 
 	const {data, error, loading} = useQuery(GET_QUESTION_CONTENT, {
-		variables : {questionId, attemptId}
+		variables : {questionId, attemptId},
+		fetchPolicy: "network-only"
 	})
 
 	React.useEffect(() => {
@@ -83,7 +84,17 @@ function Question({question, fetchNext}){
 	}
 
 	function saveQuestion(){
-
+		const answer = {question : questionId, attempt : attemptId}
+		if(data?.getQuestionContent.type.type == "Plain text"){
+			answer.content = JSON.stringify(content)
+		} else{
+			if(typeof selectedChoices == "string"){
+				answer.choices = JSON.stringify([selectedChoices])
+			} else {
+				answer.choices = JSON.stringify([...selectedChoices])
+			}
+		}
+		console.log(answer)
 	}
 
 	return(
@@ -96,7 +107,7 @@ function Question({question, fetchNext}){
 				{
 					data && (selectedChoices !== 0) && ( 
 						data.getQuestionContent.type.type == "Plain text" ? (
-							<TextEditor resetValue={(fun) => resetValue = fun} height="200px" value={content} setValue={setContent} />
+							<TextEditor resetValue={(fun) => resetValue = fun} height="150px" maxHeight="200px" value={content} setValue={setContent} />
 						) : (
 							<Choices selectedChoices={selectedChoices} setSelectedChoices={setSelectedChoices} choices={data.getQuestionContent.choices} />
 						)

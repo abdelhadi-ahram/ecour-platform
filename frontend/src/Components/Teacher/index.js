@@ -3,14 +3,14 @@ import ReactDOM from 'react-dom';
 import Sidebar from '../Sidebar';
 import RightPanel from '../RightPannel';
 import Dashboard from './Dashboard';
-import Buttons from './teacherButtons';
+import {buttons} from './teacherButtons';
 import Department from './Department';
 import Students from "./Students"
 import LectureDetails from "./LectureDetails"
 import HomeworkDetails from "./HomeworkDetails"
-import AddExam from './AddExam'
-import EditExam from './EditExam'
-import ExamDetails from "./ExamDetails"
+import AddExam from './Exam/AddExam'
+import EditExam from './Exam/EditExam'
+import ExamDetails from "./Exam/ExamDetails"
 
 import {
   Routes, Route, Navigate
@@ -19,11 +19,7 @@ import {
 export default function Teacher() {
   return(
 <div className="w-screen h-screen bg-[#f5f6f8] dark:bg-zinc-900 font-nunito flex">
-  <div className="h-screen flex flex-col items-center justify-center px-6 py-8">
-    <Sidebar>
-    <Buttons />
-    </Sidebar>
-  </div>
+    <Sidebar buttons={buttons} />
 
   <div className="w-full h-screen">
       <Routes>
