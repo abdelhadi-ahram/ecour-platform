@@ -45,24 +45,23 @@ class StudentExamQueries(graphene.ObjectType):
 
 	def resolve_get_attempt_details(self, info, attempt_id):
 		user = info.context.user 
-		if user.is_authenticated:
-			try:
-				student = Student.objects.get(user=user)
-				decoded_attempt_id = Hasher.decode(user.cin, attempt_id)
-				attempt = StudentAttempt.objects.get(pk=decoded_attempt_id)
-				if attempt.student == student:
-					ends_at = attempt.exam.starts_at + attempt.exam.duration 
-					if timezone.now() < ends_at:
-						return attempt
-					raise GraphQLError(makeJson("TIMEOUT", "This exam has been closed"))
-				raise GraphQLError(makeJson("PERMISSION", "You don'thave the permission to access this content"))
-			except StudentAttempt.DoesNotExist:
-				raise GraphQLError(makeJson("DATAERROR", "The provided data is not valid"))
-			except Student.DoesNotExist:
-				raise GraphQLError(makeJson("PERMISSION", "You do not have the permission to access this content"))
-			except:
-				raise GraphQLError(makeJson("DATAERROR", "Unvalid data"))
-		return GraphQLError(makeJson("LOGIN", "You are not logged in"))
+		try:
+			student = Student.objects.get(user=user)
+			decoded_attempt_id = Hasher.decode(user.cin, attempt_id)
+			attempt = StudentAttempt.objects.get(pk=decoded_attempt_id)
+			# if the attempt was created by the current student
+			if attempt.student == student:
+				# we check if the exam is open
+				# and the student has not already answered any question (refresh the page)
+				if attempt.exam.is_open() and not StudentQuestionAnswer.objects.filter(attempt=attempt).count() > 0:
+					return attempt
+			raise GraphQLError(makeJson("PERMISSION", "You don't have the permission to access this content"))
+		except StudentAttempt.DoesNotExist:
+			raise GraphQLError(makeJson("DATAERROR", "The provided data is not valid"))
+		except Student.DoesNotExist:
+			raise GraphQLError(makeJson("PERMISSION", "You do not have the permission to access this content"))
+		except:
+			raise GraphQLError(makeJson("DATAERROR", "Unvalid data"))
 
 	def resolve_get_question_content(self, info, question_id, attempt_id):
 		user = info.context.user 
@@ -75,6 +74,8 @@ class StudentExamQueries(graphene.ObjectType):
 				decoded_attempt_id = Hasher.decode(user.cin, attempt_id)
 				attempt = StudentAttempt.objects.get(pk=decoded_attempt_id)
 				if attempt.student == student:
+					# Check if the user has not alredy answered this question before if it is
+					# a sequentiel exam
 					if attempt.exam.sequentiel and StudentQuestionAnswer.objects.filter(attempt=attempt, question=question).exists():
 						raise GraphQLError(makeJson("PERMISSION", "You have already answered this question"))
 					return question

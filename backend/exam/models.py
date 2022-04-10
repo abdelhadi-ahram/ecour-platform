@@ -1,6 +1,7 @@
 from django.db import models
 from department.models import Section
 from django.utils import timezone
+from django.db.models import Sum
 
 from authentication.models import Student
 
@@ -23,6 +24,15 @@ class Exam(models.Model):
 		ends_at = self.starts_at + self.duration 
 		left_time = ends_at - timezone.now()
 		return left_time.total_seconds()
+
+	def is_open(self):
+		now = timezone.now()
+		return (now >= self.starts_at and now < (self.starts_at + self.duration) ) 
+
+	def get_total_marks(self):
+		obj = Question.objects.filter(exam=self).aggregate(Sum("mark"))
+		total_marks = obj["mark__sum"]
+		return total_marks
 
 class QuestionType(models.Model):
 	type = models.CharField(max_length=25)
@@ -61,13 +71,24 @@ class StudentAttempt(models.Model):
 	created_at = models.DateTimeField(auto_now=True)
 	finished_at = models.DateTimeField(null=True)
 	mark = models.FloatField(null=True)
+	is_open = models.BooleanField(default=False)
+	is_verified = models.BooleanField(default=False)
 	class Meta:
 		db_table = "student_attempt"
+
+	def verify(self):
+		obj = StudentQuestionAnswer.objects.filter(attempt=self).aggregate(Sum("mark"))
+		mark = obj["mark__sum"]
+		self.mark = mark
+		self.is_verified = True
+		self.save()
+
 
 class StudentQuestionAnswer(models.Model):
 	attempt = models.ForeignKey(StudentAttempt, related_name="answers", on_delete=models.CASCADE)
 	question = models.ForeignKey(Question, on_delete=models.CASCADE)
 	content = models.TextField(null=True)
+	mark = models.FloatField(null=True)
 	class Meta:
 		db_table = "student_question_answer"
 

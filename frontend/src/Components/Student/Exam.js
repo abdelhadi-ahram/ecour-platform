@@ -23,14 +23,17 @@ const GET_EXAM_CONTENT = gql`
 		    description
 		    isOpen
 		    message
-		    attempts
-		    studentAttempts
+		    studentAttemptsCount
 		    section{
 		    	name 
 		      element{
 		        id 
 		        name
 		      }
+		    }
+		    attempts {
+		    	mark 
+		    	createdAt
 		    }
 	  }
 	}
@@ -66,6 +69,7 @@ function Exam(){
 					</p>
 				</div>
 			</div>
+
 			<div className="w-full bg-white rounded-xl dark:bg-zinc-800 px-3 py-2 rounded shadow p-1">
 				<div className="flex flex-col space-y-8 p-2">
 					{
@@ -92,6 +96,21 @@ function Exam(){
 						{makeAttempt && <MakeAttempt isShowing={makeAttempt} onCancel={() => setMakeAttempt(false)} />}
 					</div>
 				</div>
+			</div>
+
+			<div className="w-full bg-white rounded-xl dark:bg-zinc-800 px-3 py-2 rounded shadow p-1 flex flex-col space-y-3">
+				<p className="text-gray-700 dark:text-gray-400 font-semibold">My attempts</p>
+				{
+					data?.getExamContent.attempts.map((attempt, index) => {
+						return (
+							<div key={index} className="border dark:border-zinc-700 p-2 rounded-lg flex items-center justify-between">
+								<div className="dark:text-gray-300">Attempt {index+1}</div>
+								{attempt.mark && <div className="dark:text-gray-300">Mark <span className="text-gray-200">{attempt.mark}</span></div>}
+								<div className="dark:text-gray-300"><span className="text-gray-400">{attempt.createdAt}</span></div>
+							</div>
+						)
+					})
+				}
 			</div>
 		</div>
 	)

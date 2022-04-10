@@ -10,6 +10,8 @@ import HomeworkDetails from "./HomeworkDetails"
 import AddExam from './Exam/AddExam'
 import EditExam from './Exam/EditExam'
 import ExamDetails from "./Exam/ExamDetails"
+import StudentAttempts from "./Exam/StudentAttempts"
+import CorrectAttempt from "./Exam/CorrectAttempt"
 
 import {
   Routes, Route, Navigate
@@ -30,6 +32,8 @@ export default function Teacher() {
         <Route path="/add-exam/:sectionId" element={<RightPanel><AddExam /></RightPanel>} />
         <Route path="/edit-exam/:examId" element={<RightPanel withoutCalendar><EditExam /></RightPanel>} />
         <Route path="/exam-details/:examId" element={<RightPanel><ExamDetails /></RightPanel>} />
+        <Route path="/exam-results/:examId" element={<RightPanel><StudentAttempts /></RightPanel>} />
+        <Route path="/correct-attempt/:attemptId" element={<RightPanel withoutCalendar><CorrectAttempt /></RightPanel>} />
       </Routes>
   </div>
 

@@ -7,8 +7,9 @@ from graphql import GraphQLError
 import json
 
 from student.models import HomeworkFinished, LectureFinished, ElementLog, ExamFinished
-from exam.models import QuestionType, Question, Choice, Exam
+from exam.models import QuestionType, Question, Choice, Exam, StudentAttempt, StudentQuestionAnswer
 from authentication.hash import Hasher
+from authentication.user_queries import require_auth, require_teacher
 import math
 
 from department.types import (
@@ -27,7 +28,9 @@ from exam.types import (
 	QuestionModelType,
 	ExamType,
 	ChoiceType,
-	QuestionTypeType
+	QuestionTypeType,
+	AttemptType,
+	StudentQuestionAnswerType
 )
 
 def makeJson(type, text):
@@ -59,6 +62,9 @@ class TeacherQueries(graphene.ObjectType):
 	get_exam_questions = graphene.List(QuestionModelType, exam_id=graphene.ID())
 
 	get_exam_by_id = graphene.Field(ExamType, exam_id=graphene.ID())
+	get_attempt_content = graphene.Field(AttemptType, attempt_id=graphene.ID())
+
+	get_question_answer = graphene.Field(StudentQuestionAnswerType, question_id=graphene.ID(), attempt_id=graphene.ID())
 
 	def resolve_get_teachings(self, info):
 		user = info.context.user
@@ -133,41 +139,61 @@ class TeacherQueries(graphene.ObjectType):
 	def resolve_get_question_types(self, info):
 		return QuestionType.objects.all()
 
+	@require_teacher
 	def resolve_get_exam_questions(self, info, exam_id):
-		user = info.context.user 
+		teacher = info.context.user.teacher 
 		if user.is_authenticated:
 			try:
 				decoded_id = Hasher.decode("exam", exam_id)
 				exam = Exam.objects.get(pk=decoded_id)
-				teacher = Teacher.objects.get(user=user)
 				Teaching.objects.get(element=exam.section.element, teacher=teacher)
 				return Question.objects.filter(exam=exam)
 			except Exam.DoesNotExist:
 				raise GraphQLError(makeJson("DATAERROR", "The provided data is not valid"))
-			except Teacher.DoesNotExist:
-				raise GraphQLError(makeJson("PERMISSION", "You don't have the permission to see this content"))
 			except Teaching.DoesNotExist:
 				raise GraphQLError(makeJson("PERMISSION", "You don't have the permission to see this content"))
 		else :
 			raise GraphQLError(makeJson("LOGIN", "You are not logged in"))
 
 
+	@require_teacher
 	def resolve_get_exam_by_id(self, info, exam_id):
-		user = info.context.user 
-		if user.is_authenticated:
-			try:
-				decoded_exam_id = Hasher.decode("exam", exam_id)
-				exam = Exam.objects.get(pk=decoded_exam_id)
-				teacher = Teacher.objects.get(user=user)
-				Teaching.objects.get(element=exam.section.element, teacher=teacher)
-				return exam
-			except Exam.DoesNotExist:
-				raise GraphQLError(makeJson("DATAERROR", "The provided data is not valid"))
-			except Teacher.DoesNotExist:
-				raise GraphQLError(makeJson("PERMISSION", "You don't have the permission to see this content"))
-			except Teaching.DoesNotExist:
-				raise GraphQLError(makeJson("PERMISSION", "You don't have the permission to see this content"))		
-		else :
-			raise GraphQLError(makeJson("LOGIN", "You are not logged in"))
+		teacher = info.context.user.teacher
+		try:
+			decoded_exam_id = Hasher.decode("exam", exam_id)
+			exam = Exam.objects.get(pk=decoded_exam_id)
+			Teaching.objects.get(element=exam.section.element, teacher=teacher)
+			return exam
+		except Exam.DoesNotExist:
+			raise GraphQLError(makeJson("DATAERROR", "The provided data is not valid"))
+		except Teaching.DoesNotExist:
+			raise GraphQLError(makeJson("PERMISSION", "You don't have the permission to see this content"))		
+
+
+	@require_teacher
+	def resolve_get_attempt_content(self, info, attempt_id):
+		teacher = info.context.user.teacher
+		try:
+			decoded_attempt_id = Hasher.decode(teacher.user.cin, attempt_id)
+			attempt = StudentAttempt.objects.get(id=decoded_attempt_id)
+			Teaching.objects.get(element=attempt.exam.section.element, teacher=teacher)
+			return attempt
+		except StudentAttempt.DoesNotExist:
+			raise GraphQLError(makeJson("DATAERROR", "The provided data is not valid"))
+		except Teaching.DoesNotExist:
+			raise GraphQLError(makeJson("PERMISSION", "You don't have the permission to see this content"))	
+
+
+	@require_teacher
+	def resolve_get_question_answer(self, info, question_id, attempt_id):
+		user = info.context.user
+		decoded_attempt_id = Hasher.decode(user.cin, attempt_id)
+		decoded_question_id = Hasher.decode(user.cin, question_id)
+		try:
+			return StudentQuestionAnswer.objects.get(question__id=decoded_question_id, attempt__id=decoded_attempt_id) 
+		except StudentQuestionAnswer.DoesNotExist:
+			raise GraphQLError(makeJson("DATAERROR","The provided data is not valid"))
+		except Exception as e:
+			raise GraphQLError(e)
 
 

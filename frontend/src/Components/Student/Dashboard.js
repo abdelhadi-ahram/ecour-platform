@@ -29,6 +29,13 @@ const LastCourses = [
 
 const GET_ELEMENTS = gql`
   query GetDepartmentModules{
+    getLastAccessedCourses{
+      id
+      name
+      module {
+        name
+      }
+    }
    getDepartmentModules{
     name
     elements{
@@ -52,10 +59,10 @@ export default function Dashboard(){
     <div className="flex flex-col space-y-4">
       <div className="flex flex-col space-y-2 bg-white dark:bg-zinc-800 p-4 rounded-lg">
         <p className="text-md font-semibold text-gray-700 dark:text-gray-200">Last accessed courses</p>
-        <div className="flex flex-col space-y-2 lg:space-y-0 lg:flex-row lg:space-x-4">
-          {LastCourses.map((item, index) => {
+        <div className="flex flex-col space-y-2 lg:grid lg:space-y-0 lg:grid-cols-3 lg:gap-2">
+          {data?.getLastAccessedCourses.map((item, index) => {
               return(
-                <div className="lg:w-1/3">
+                <div >
                   <Card item={item} key={index} index={index} />
                 </div>
               )
@@ -71,7 +78,7 @@ export default function Dashboard(){
               <svg className="w-6 h-6 text-gray-400 dark:border-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" /></svg>
             </div>
           </div>
-          <div className="flex flex-col space-y-2 md:grid md:grid-cols-2 md:gap-4">
+          <div className="flex flex-col space-y-2 md:space-y-0 md:grid md:grid-cols-2 md:gap-4">
           {
             (data?.getDepartmentModules.map((module_, index) => {
               const moduleName = module_.name

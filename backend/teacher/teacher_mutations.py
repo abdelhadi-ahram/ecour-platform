@@ -3,10 +3,11 @@ from graphene_file_upload.scalars import Upload
 import graphene
 from department.models import Section, Teaching, Lecture, Element, Homework
 from authentication.models import Teacher
-from exam.models import (Exam, QuestionType, Choice, Question)
+from exam.models import (Exam, QuestionType, Choice, Question, StudentQuestionAnswer, StudentAttempt)
 
 from graphql import GraphQLError
 from authentication.hash import Hasher
+from authentication.user_queries import require_teacher
 
 import json
 import datetime
@@ -391,3 +392,47 @@ class AddQuestions(graphene.Mutation):
 				raise GraphQLError(e)
 		else:
 			raise GraphQLError(makeJson("LOGIN", "You are not logged in"))
+
+
+class VerifyAnswer(graphene.Mutation):
+	class Arguments:
+		attempt_id = graphene.ID()
+		question_id = graphene.ID()
+		mark = graphene.Float()
+
+	ok = graphene.Boolean()
+
+	@require_teacher
+	def mutate(self, info, mark, attempt_id, question_id):
+		user = info.context.user 
+		decoded_question_id = Hasher.decode(user.cin, question_id)
+		decoded_attempt_id = Hasher.decode(user.cin, attempt_id)
+		try:
+			user_question_answer = StudentQuestionAnswer.objects.get(question__id=decoded_question_id, attempt__id=decoded_attempt_id)
+			user_question_answer.mark = float(mark)
+			user_question_answer.save()
+			print(mark)
+			return VerifyAnswer(ok=True)
+		except StudentQuestionAnswer.DoesNotExist:
+			raise GraphQLError(makeJson("DATAERROR", "The provided data is not valid"))
+		except :
+			raise GraphQLError(makeJson("ERROR", "Unexpected error"))
+
+class VerifyAttempt(graphene.Mutation):
+	class Arguments:
+		attempt_id = graphene.ID()
+
+	ok = graphene.Boolean()
+
+	@require_teacher
+	def mutate(self, info, attempt_id):
+		user = info.context.user
+		decoded_attempt_id = Hasher.decode(user.cin, attempt_id)
+		try:
+			user_attempt = StudentAttempt.objects.get(id=decoded_attempt_id)
+			print(user_attempt.verify() )
+			return VerifyAttempt(ok=True)
+		except StudentAttempt.DoesNotExist:
+			raise GraphQLError(makeJson("DATAERROR", "The provided data is not valid"))
+		except Exception as e:
+			raise GraphQLError(e)

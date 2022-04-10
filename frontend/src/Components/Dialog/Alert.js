@@ -6,9 +6,9 @@ function Alert({text}){
   const [isShown, setIsShown] = React.useState(false)
 
   React.useEffect(() => {
-    const controller = new AbortController();
     setIsShown(true)
-    setTimeout(() => setIsShown(false), 5000)
+    const controller = setTimeout(() => setIsShown(false), 5000);
+    return () => clearTimeout(controller)
   }, [])
 
   return(

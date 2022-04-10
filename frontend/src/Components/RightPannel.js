@@ -15,7 +15,7 @@ export default function RightPannel(props){
 
       {
         props.withoutCalendar ?(
-          <div className="py-3 px-2 flex space-x-1 grow overflow-y-hidden">
+          <div className="py-3 px-2 flex space-x-1 grow lg:overflow-y-hidden">
               {props.children}
           </div>
         ):(

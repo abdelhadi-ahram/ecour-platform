@@ -69,3 +69,4 @@ class ElementLog(models.Model):
 
 	class Meta:
 		db_table = "element_log"
+		ordering = ('-created_at', )

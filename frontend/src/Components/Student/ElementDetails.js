@@ -169,7 +169,7 @@ export default function Courses(){
 
 				<div className="flex flex-col space-y-8 p-2">
 					{data?.getElementContent.sections.map((item, index) => {
-						return emptySection(item) ?
+						return filledSection(item) ?
 						 (
 							<Section key={index} section={item} />
 						)
@@ -183,6 +183,6 @@ export default function Courses(){
 }
 
 
-function emptySection(section){
-	return (section.exams.length && section.lectures.length && section.homeworks.length)
+function filledSection(section){
+	return (section.exams.length || section.lectures.length || section.homeworks.length)
 }

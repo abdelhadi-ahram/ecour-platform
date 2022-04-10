@@ -48,7 +48,7 @@ function LectureDetails(){
 					<Link to={`/my/element/${data?.getLectureContent.section.element.id}`}>
 						<p className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 ">{data?.getLectureContent.section.element.name}</p>
 					</Link> 
-					<span>/</span>
+					<span className="text-gray-400">/</span>
 					<p className="text-gray-700 dark:text-gray-300">
 						{data?.getLectureContent.title}
 					</p>

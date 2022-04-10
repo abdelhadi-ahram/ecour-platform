@@ -27,7 +27,8 @@ class CustomStudentType(DjangoObjectType):
 	def resolve_email(self, info):
 		return self.user.email
 	def resolve_id(self, info):
-		return self.user.id
+		encoded_id = Hasher.encode("student", self.user.id)
+		return encoded_id
 
 class TeachingType(DjangoObjectType):
     class Meta:

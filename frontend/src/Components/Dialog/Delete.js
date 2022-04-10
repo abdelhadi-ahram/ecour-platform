@@ -33,10 +33,10 @@ function DeleteDialog({onCancel, onDelete}){
         >
           <div className="w-[92%] sm:w-[450px] bg-white dark:bg-zinc-800 rounded-xl translate-y-12 px-6 py-5 shadow-lg flex flex-col space-y-2">
             <p className='font-bold text-gray-800 dark:text-gray-200 text-xl'>Logout</p>
-            <p className='font-bold text-gray-400 text-lg'>Are you sure you want to logout?</p>
+            <p className='font-bold text-gray-400 text-lg'>Are you sure you want to delete this element?</p>
             <div className="flex justify-end items-center py-2">
               <button className="cancel-btn" onClick={hideLogoutDialog}>Cancel</button>
-              <button className="text-red-500 bg-red-50 rounded-lg px-3 py-2 font-semibold" onClick={deleteClicked} >Delete</button>
+              <button className="text-red-500 bg-red-50 dark:bg-zinc-700 rounded-lg px-3 py-2 font-semibold" onClick={deleteClicked} >Delete</button>
             </div>
           </div>
         </Transition>
