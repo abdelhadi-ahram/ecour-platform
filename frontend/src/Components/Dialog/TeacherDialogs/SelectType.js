@@ -41,7 +41,7 @@ function SelectType(){
             <Link to={`/my/add-exam/${sectionId}`}>
               <div className="flex items-center space-x-3 w-full rounded-lg p-2 text-gray-600 dark:text-gray-400 hover:bg-blue-50 dark:hover:bg-zinc-700 hover:text-blue-500 dark:hover:text-blue-400 hover:font-semibold cursor-pointer">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                <p className="">Homework</p>
+                <p className="">Exam</p>
               </div>
             </Link>
           </div>

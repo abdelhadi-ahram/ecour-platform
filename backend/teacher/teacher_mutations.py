@@ -170,29 +170,25 @@ class DeleteLecture(graphene.Mutation):
 
 class AddSection(graphene.Mutation):
 	class Arguments:
-		element_id = graphene.ID()
+		teaching_id = graphene.ID()
 		name = graphene.String()
 
-	ok = graphene.Boolean()
+	sectionId = graphene.ID()
 
-	def mutate(self, info, element_id, name):
-		user = info.context.user
-		if user.is_authenticated:
-			try:
-				teacher = Teacher.objects.get(user=user)
-				element = Element.objects.get(id=element_id)
-				if Teaching.objects.filter(teacher=teacher, element=element).exists():
-					section = Section(element=element, name=name)
-					section.save()
-					return AddSection(ok=True)
-				else:
-					raise GraphQLError(makeJson("PERMISSION", "You do not have the right to perform this action"))
-			except Teaching.DoesNotExist:
-				raise GraphQLError(makeJson("PERMISSION", "Only teachers are allowed to perform this action"))
-			except Exception as e:
-				raise GraphQLError(e)
-		else:
-			raise GraphQLError(makeJson("LOGIN", "You are not logged in"))
+	@require_teacher
+	def mutate(self, info, teaching_id, name):
+		teacher = info.context.user.teacher
+		try:
+			teaching = Teaching.objects.get(id=teaching_id)
+			if teaching.teacher == teacher:
+				section = Section(element=teaching.element, name=name)
+				section.save()
+				return AddSection(sectionId=section.id)
+			raise GraphQLError(makeJson("PERMISSION", "You are not allowed to perform this action"))
+		except Teaching.DoesNotExist:
+			raise GraphQLError(makeJson("PERMISSION", "Only teachers are allowed to perform this action"))
+		except Exception as e:
+			raise GraphQLError(e)
 
 
 
@@ -344,54 +340,58 @@ class AddQuestions(graphene.Mutation):
 
 	ok = graphene.Boolean() 
 
+	@require_teacher
 	def mutate(self, info, exam_id, exam_data):
-		user = info.context.user 
-		if user.is_authenticated:
-			try:
-				teacher = Teacher.objects.get(user=user)
-				decoded_exam_id = Hasher.decode("exam", exam_id)
-				exam = Exam.objects.get(pk=decoded_exam_id)
-				Teaching.objects.get(teacher=teacher, element=exam.section.element)
-				questions = json.loads(exam_data)
-				for question in questions:
-					question_id = question.get("id", 0)
-					type = QuestionType.objects.get(pk=int(question["type"]) )
-					mark = question.get("mark", 1)
-					choices = question.get("choices", [])
-					content = json.dumps(question.get("content", []) )
-					if type.type != "Plain text" and len(choices) == 0:
-						raise GraphQLError(makeJson("DATAERROR", "You must provide at least one choice"))
+		teacher = info.context.user.teacher
+		try:
+			decoded_exam_id = Hasher.decode("exam", exam_id)
+			exam = Exam.objects.get(pk=decoded_exam_id)
+			# check if the teacher is teaching this element
+			Teaching.objects.get(teacher=teacher, element=exam.section.element)
+			# convert the recieved data to a valid python object
+			questions = json.loads(exam_data)
+			# looping on the questions
+			for question in questions:
+				question_id = question.get("id", 0)
+				type = QuestionType.objects.get(pk=int(question["type"]) )
+				mark = question.get("mark", 1)
+				choices = question.get("choices", [])
+				content = json.dumps(question.get("content", []) )
+				# check if the user did not provide choices
+				if type.type != "Plain text" and len(choices) == 0:
+					raise GraphQLError(makeJson("DATAERROR", "You must provide at least one choice"))
+				else:
+					# check if the user wants to update an existig question
+					if question_id:
+						decoded_question_id = Hasher.decode("question", question_id)
+						print(decoded_question_id)
+						question = Question.objects.get(pk=decoded_question_id)
+						question.content = content if content else None
+						question.mark = mark if mark else None
+						question.type = type if type else None
 					else:
-						if question_id:
-							decoded_question_id = Hasher.decode("question", question_id)
-							question = Question.objects.get(pk=decoded_question_id)
-							question.content = content
-							question.mark = mark
-							question.type = type
+						question = Question(content=content, mark=mark, type=type, exam=exam)
+					question.save()
+					for choice_ in choices:
+						choice_id = choice_.get("id", 0)
+						# check if the user wants to update an existing choice
+						if choice_id:
+							decoded_choice_id = Hasher.decode(teacher.user.cin, choice_id)
+							choice = Choice.objects.get(pk=decoded_choice_id)
+							choice.content = choice_.get("content")
+							choice.is_correct = choice_.get("isCorrect", False)
 						else:
-							question = Question(content=content, mark=mark, type=type, exam=exam)
-						question.save()
-						for choice_ in choices:
-							choice_id = choice_.get("id", 0)
-							if choice_id:
-								decoded_choice_id = Hasher.decode("choice", choice_id)
-								choice = Choice.objects.get(pk=decoded_choice_id)
-								choice.content = choice_.get("content")
-								choice.is_correct = choice_.get("isCorrect", False)
-							else:
-								choice = Choice(question=question, content=choice_.get("content"), is_correct=choice_.get("isCorrect"))
-							choice.save()
-				return (AddQuestions(ok=True))
-			except Teacher.DoesNotExist:
-				raise GraphQLError(makeJson("PERMISSION", "You do not have the permission to perform this action"))
-			except Exam.DoesNotExist:
-				raise GraphQLError(makeJson("DATAERROR", "The provided exam is not valid"))
-			except Exam.DoesNotExist:
-				raise GraphQLError(makeJson("PERMISSION", "You are not allowed to perform this action"))
-			except Exception as e:
-				raise GraphQLError(e)
-		else:
-			raise GraphQLError(makeJson("LOGIN", "You are not logged in"))
+							choice = Choice(question=question, content=choice_.get("content"), is_correct=choice_.get("isCorrect"))
+						choice.save()
+			return AddQuestions(ok=True)
+		except Teacher.DoesNotExist:
+			raise GraphQLError(makeJson("PERMISSION", "You do not have the permission to perform this action"))
+		except Exam.DoesNotExist:
+			raise GraphQLError(makeJson("DATAERROR", "The provided exam is not valid"))
+		except Exam.DoesNotExist:
+			raise GraphQLError(makeJson("PERMISSION", "You are not allowed to perform this action"))
+		except Exception as e:
+			raise GraphQLError(e)
 
 
 class VerifyAnswer(graphene.Mutation):

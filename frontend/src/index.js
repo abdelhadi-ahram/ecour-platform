@@ -29,7 +29,8 @@ const link = createUploadLink({
 
 const client = new ApolloClient({
   cache: new InMemoryCache(),
-  link
+  link,
+  defaultOptions : {query: {fetchPolicy: 'network-only'}}
 });
 
 window.addEventListener("dragover",function(e){

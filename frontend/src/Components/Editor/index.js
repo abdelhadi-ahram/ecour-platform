@@ -131,7 +131,6 @@ const TextEditor = ({ value, setValue, resetValue, height, maxHeight}) => {
                   return <BlockButton key={`${item}-${index}`} format={item.format} icon={item.icon}  />
                 })}
                 <ColorPicker />
-                <button className="font-bold text-gray-400" onMouseDown={() => {resetValueWrapper(editor, value)}}>{"Test"}</button>
               </div>
             </Transition>
 

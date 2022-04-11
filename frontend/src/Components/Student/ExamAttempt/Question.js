@@ -49,7 +49,7 @@ const generateChoicesForm = (type) => {
 }
 
 
-function Question({question, fetchNext}){
+function Question({question, fetchNext, index, isLast, setExamFinished}){
 	const [questionId, setQuestionId] = React.useState(question)
 	const {attemptId} = useParams()
 	const [selectedChoices, setSelectedChoices] = React.useState(0)
@@ -71,9 +71,6 @@ function Question({question, fetchNext}){
 		setQuestionId(question)
 	}, [question])
 
-	React.useEffect(() => {
-		fetchNext()
-	}, [saveQuestionResponse.data])
 
 	if (loading) return <LoadingQuestion />
 	if(error) {
@@ -97,11 +94,17 @@ function Question({question, fetchNext}){
 			}
 		}
 		saveQuestionAnswer({variables : answer})
+		.then((data) => {
+			if(isLast) setExamFinished(true)
+			else fetchNext()
+		}, (err) => {
+			console.log(err)
+		})
 	}
 
 	return(
 		<div className="flex flex-col space-y-3 py-1 px-2 flex-1 overflow-y-auto">
-			<QuestionInfo resetQuestion={resetQuestion} mark={data?.getQuestionContent.mark} estimatedTime={data?.getQuestionContent.estimatedTime} />
+			<QuestionInfo index={index} resetQuestion={resetQuestion} mark={data?.getQuestionContent.mark} estimatedTime={data?.getQuestionContent.estimatedTime} />
 			<div className="flex flex-col p-2 flex-1 overflow-y-auto">
 				<div className="py-6 text-gray-100 text-lg select-none">
 					{Serializer(JSON.parse(data?.getQuestionContent.content || "[]")) }
@@ -116,6 +119,7 @@ function Question({question, fetchNext}){
 					)
 				}
 			</div>
+
 			<div className="flex items-center justify-end p-2">
               <button onClick={saveQuestion} className="post-btn">Next</button>
             </div>

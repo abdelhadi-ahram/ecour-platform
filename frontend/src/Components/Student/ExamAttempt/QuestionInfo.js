@@ -1,7 +1,7 @@
 import React from "react"
 import moment from "moment"
 
-function QuestionInfo({estimatedTime, mark, resetQuestion}){
+function QuestionInfo({estimatedTime, mark, resetQuestion, index}){
 	const [idealTime, setIdealTime] = React.useState(0)
 	var initialVal = 0;
 
@@ -20,7 +20,7 @@ function QuestionInfo({estimatedTime, mark, resetQuestion}){
 	return(
 		<div className="w-full flex items-center justify-between rounded-md border border-zinc-700 p-2">
 			<div>
-				<p className='text-gray-400 '>Question 01</p>
+				<p className='text-gray-400 '>Question {(index < 10) ? "0" + index : index}</p>
 			</div>
 			<div className="flex items-center space-x-2">
 				<div className="flex items-center space-x-1 text-gray-400 text-sm px-2 py-[1px] rounded-full bg-zinc-700 cursor-pointer" onClick={resetQuestion}>

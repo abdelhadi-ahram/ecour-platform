@@ -1,5 +1,6 @@
 import React from "react";
 import Question from "./Question"
+import AttemptSummary from "./AttemptSummary"
 import {
   useQuery, gql
 } from "@apollo/client"
@@ -27,6 +28,7 @@ function ExamAttempt(){
   const [questions, setQuestions] = React.useState([])
   const [selected, setSelected] = React.useState(0)
   const [leftTime, setLeftTime] = React.useState(0)
+  const [examFinished, setExamFinished] = React.useState(false)
   const {data, error, loading} = useQuery(GET_ATTEMPT_DETAILS, {variables : {attemptId}})
 
   const navigate = useNavigate()
@@ -38,7 +40,6 @@ function ExamAttempt(){
     }
   }, [data])
 
-  var timer = null;
 
   React.useEffect(() => {
     var timer;
@@ -107,7 +108,12 @@ function ExamAttempt(){
               <p className={` font-semibold ${leftTime < 30 ? "text-red-400" : "text-gray-600 dark:text-gray-300"}`}>{moment.utc(leftTime*1000).format("HH:mm:ss")}</p>
             </div>
             <div className="flex-1 grow flex flex-col overflow-y-auto" >
-              {questions[selected] && <Question question={questions[selected]?.id} fetchNext={fetchNext} />}
+              {questions.length && (
+                examFinished ?
+                <AttemptSummary />
+                : 
+                <Question index={selected} isLast={questions.length-1 == selected} question={questions[selected]?.id} fetchNext={fetchNext} setExamFinished={setExamFinished} />
+              )}
             </div>
           </div>
 
@@ -123,7 +129,7 @@ function ExamAttempt(){
                   questions?.map((question, index) => {
                     const isSelected = selected == index
                     const sequentiel = data.getAttemptDetails.sequentiel
-                    return <button onClick={() => selectQuestion(index)} disabled={sequentiel} key={index} className={`p-[4px] flex flex-col items-center justify-center border rounded-lg ${isSelected ? "border-indigo-400 text-indigo-500 bg-blue-50 dark:bg-zinc-700" : "text-gray-600 dark:text-gray-300 border-gray-300 dark:border-zinc-600"} disabled:bg-green-500`}>{index}</button>
+                    return <button onClick={() => selectQuestion(index)} disabled={sequentiel} key={index} className={`p-[4px] flex flex-col items-center justify-center border rounded-lg ${isSelected ? "border-indigo-400 text-indigo-500 bg-blue-50 dark:bg-zinc-700" : "text-gray-600 dark:text-gray-300 border-gray-300 dark:border-zinc-600"} disabled:cursor-not-allowed`}>{index}</button>
                   })
                 }
               </div>

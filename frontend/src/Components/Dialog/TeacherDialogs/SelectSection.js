@@ -5,6 +5,7 @@ import {LoadingCard} from "../../Loadings"
 import {SelectedDepartment} from "../../Teacher/Department"
 
 import {
+  useMutation,
   useQuery,
   gql
 } from "@apollo/client"
@@ -22,17 +23,39 @@ const GET_LECTURES_SECTIONS = gql`
   }
 `;
 
+const ADD_SECTION = gql`
+  mutation AddSection($teachingId: ID!, $name : String!){
+    addSection(teachingId: $teachingId, name: $name){
+      sectionId
+    }
+  }
+`;
 
 function SelectSection(){
   const teachingId = React.useContext(SelectedDepartment)
-  const {data, loading, error} = useQuery(GET_LECTURES_SECTIONS, {variables : {teachingId}})
-
+  const {data, loading, error} = useQuery(GET_LECTURES_SECTIONS, {
+    variables : {teachingId}, fetchPolicy : "network-only", refetchQueries : ["GetElementSection"]
+  })
+  const [addNewSction] = useMutation(ADD_SECTION)
   const [showAdd, setShowAdd] = React.useState(false)
 
   const navigate = useNavigate()
 
   function cancelClicked(){
     navigate("/my")
+  }
+
+  function addSection(e){
+    if (e.key == "Enter"){
+      console.log("Enter")
+      const name = e.target.value
+      addNewSction({variables : {teachingId, name}})
+      .then((res) => {
+        navigate(`/my/select-type/${res.data.addSection.sectionId}`)
+      }, (err) => {
+        console.log(err)
+      })
+    }
   }
 
   return(
@@ -67,7 +90,7 @@ function SelectSection(){
               leaveFrom="scale-y-1"
               leaveTo="scale-y-0"
             >
-            <input className="mt-1 text-gray-700 dark:text-gray-200 w-full rounded-md p-2 bg-gray-50 dark:bg-zinc-700 focus:outline-none border border-transparent ring-1 ring-gray-300 dark:ring-zinc-700" placeholder="Add a section" />
+            <input onKeyDown={addSection} className="mt-1 text-gray-700 dark:text-gray-200 w-full rounded-md p-2 bg-gray-50 dark:bg-zinc-700 focus:outline-none border border-transparent ring-1 ring-gray-300 dark:ring-zinc-700" placeholder="Add a section" />
             </Transition>
           </div>
 

@@ -22,7 +22,8 @@ const ADD_EXAM = gql`
 function Boolean({value, onChange, selected}){
 	const [isSelected, setIsSelected] = React.useState(selected)
 	return(
-		<div onClick={() => {onChange(!isSelected); setIsSelected(!isSelected)}} className={`w-full rounded flex items-center justify-between px-2 py-1 border ${isSelected ? "bg-blue-50 dark:bg-zinc-700 border-blue-400 text-blue-400" : "bg-transparent border-gray-300 dark:border-zinc-700 dark:text-gray-200 hover:border-gray-300 dark:hover:border-zinc-600"}`} >
+		<div onClick={() => {onChange(!isSelected); setIsSelected(!isSelected)}} 
+			className={`w-full cursor-pointer rounded flex items-center justify-between px-2 py-1 border ${isSelected ? "bg-blue-50 dark:bg-zinc-700 border-blue-400 text-blue-400 dark:text-blue-500" : "bg-transparent border-gray-300 dark:border-zinc-700 dark:text-gray-200 hover:border-gray-300 dark:hover:border-zinc-600"}`} >
 			<p>{value}</p>
 			<span className={`${isSelected ? "text-blue-400" : "text-gray-300"}`}>
 				<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
@@ -64,22 +65,21 @@ function AddExam(){
 		const description = JSON.stringify(editorValue)
 		addExam({variables: {
 			sectionId, title, duration, sequentiel, attempts, startsAt, description
-		}})
-
-		/*
-			onComplete : (data) => {
-			if(data?.addExam.id){
-				navigate(`/my/edit-exam/${data.addExam.id}`)
+		}}).then((res) => {
+			if(res.data.addExam.id){
+				navigate(`/my/edit-exam/${res.data.addExam.id}`)
 			}
-		}
-		*/
+		})
+		.catch(err => {
+			alert("Error occurred")
+		})
 	}
 
-	React.useEffect(() => {
+	/*React.useEffect(() => {
 		if(data?.addExam.id){
 			navigate(`/my/edit-exam/${data.addExam.id}`)
 		}
-	}, [data])
+	}, [data])*/
 
 	function resetValue(){}
 

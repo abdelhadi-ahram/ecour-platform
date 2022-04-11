@@ -136,12 +136,12 @@ class AttemptType(DjangoObjectType):
 		exam = self.exam
 		questions = list(Question.objects.filter(exam=exam) )
 		if info.context.user.is_student():
-			if self.exam.is_open() and StudentAttempt.objects.filter(exam=self.exam).count() < self.exam.attempts:
+			if self.exam.is_open() and StudentAttempt.objects.filter(exam=self.exam).count() <= self.exam.attempts:
 				shuffle(questions)
 				return questions
 		else:
 			return questions
-		raise GraphQLError(makeJson("PERMISSION", "You do not have the right to perform this action"))
+		raise GraphQLError(makeJson("PERMISSION", "You do not have the right to access this attempt"))
 
 	def resolve_left_time(self, info):
 		return self.exam.get_left_time()

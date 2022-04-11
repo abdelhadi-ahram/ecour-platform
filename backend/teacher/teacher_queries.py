@@ -142,18 +142,15 @@ class TeacherQueries(graphene.ObjectType):
 	@require_teacher
 	def resolve_get_exam_questions(self, info, exam_id):
 		teacher = info.context.user.teacher 
-		if user.is_authenticated:
-			try:
-				decoded_id = Hasher.decode("exam", exam_id)
-				exam = Exam.objects.get(pk=decoded_id)
-				Teaching.objects.get(element=exam.section.element, teacher=teacher)
-				return Question.objects.filter(exam=exam)
-			except Exam.DoesNotExist:
-				raise GraphQLError(makeJson("DATAERROR", "The provided data is not valid"))
-			except Teaching.DoesNotExist:
-				raise GraphQLError(makeJson("PERMISSION", "You don't have the permission to see this content"))
-		else :
-			raise GraphQLError(makeJson("LOGIN", "You are not logged in"))
+		try:
+			decoded_id = Hasher.decode("exam", exam_id)
+			exam = Exam.objects.get(pk=decoded_id)
+			Teaching.objects.get(element=exam.section.element, teacher=teacher)
+			return Question.objects.filter(exam=exam)
+		except Exam.DoesNotExist:
+			raise GraphQLError(makeJson("DATAERROR", "The provided data is not valid"))
+		except Teaching.DoesNotExist:
+			raise GraphQLError(makeJson("PERMISSION", "You don't have the permission to see this content"))
 
 
 	@require_teacher

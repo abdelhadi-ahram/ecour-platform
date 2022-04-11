@@ -9,7 +9,7 @@ export function PulseSquare({width, height}){
 export function LoadingPage(){
 	return (
 		<div className="fixed inset-0">
-			<div className="fixed inset-0 bg-gradient-to-br from-blue-400 to-indigo-500 dark:from-zinc-900 dark:via-zinc-700 dark:to-zinc-900 dark:opacity-20 dark:opacity-90"></div>
+			<div className="fixed inset-0 bg-gradient-to-br from-blue-400 to-indigo-500 dark:from-zinc-900 dark:via-zinc-700 dark:to-zinc-900 opacity-20 dark:opacity-90"></div>
 			<div className="fixed inset-0 flex flex-col items-center justify-center z-10">
 				<div className="relative">
 					<div className="absolute inset-0 animate-ping p-2 bg-[#6aa5ff] text-white flex justify-center items-center rounded-xl">

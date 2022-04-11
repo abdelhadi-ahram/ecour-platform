@@ -30,7 +30,7 @@ function CreateNode(node){
     case "heading-one":
       return <h1>{Serialize(node.children)}</h1>
     default:
-      return <p>{Serialize(node.children)}</p>
+      return <div>{Serialize(node.children)}</div>
   }
 }
 
