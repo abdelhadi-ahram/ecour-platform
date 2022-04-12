@@ -15,7 +15,7 @@ import datetime
 def getFileType(file):
 	if file.endswith(("jpg","png", "jpeg")):
 		return "image"
-	elif file.endswith((".mp4",)):
+	elif file.endswith((".mp4", "ogg", "webM")):
 		return "video"
 	elif file.endswith('.pdf'):
 		return "pdf"

@@ -10,22 +10,6 @@ import {
   gql
 } from "@apollo/client"
 
-const LastCourses = [
-  {
-    "module" : "Module 1",
-    "name" : "Algorithms and C",
-    "teacher" : "Mr. Sabour"
-  },
-  {
-    "module" : "Module 09",
-    "name" : "Algebra 02",
-    "teacher" : "Mr. Ait Zemzami"
-  },
-  {
-    "module" : "Module 10",
-    "name" : "Java",
-    "teacher" : "Mr. Mazoul"
-  }];
 
 const GET_ELEMENTS = gql`
   query GetDepartmentModules{

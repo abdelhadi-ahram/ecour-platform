@@ -1,6 +1,6 @@
 import React from "react";
 import {LoadingPage} from "../Loadings"
-
+import MediaParser from "../Media/MediaParser"
 import Serializer from "../Editor/Serializer"
 
 import {
@@ -18,6 +18,8 @@ const GET_LECTURE_CONTENT = gql`
 	   getLectureContent(lectureId: $lectureId){
 		    title
 		    content
+		    file
+		    type
 		    section{
 		      element{
 		        id 
@@ -56,9 +58,7 @@ function LectureDetails(){
 			</div>
 			<div className="w-full bg-white rounded-xl dark:bg-zinc-800 px-3 py-2 rounded shadow p-1">
 				<div className="flex flex-col space-y-8 p-2">
-					{
-						Serializer(JSON.parse(data?.getLectureContent.content || "[]"))
-					}
+					<MediaParser lecture={data?.getLectureContent} />
 				</div>
 			</div>
 		</div>

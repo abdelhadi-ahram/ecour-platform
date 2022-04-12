@@ -1,7 +1,7 @@
 import React from "react";
 import TextEditor from "../../Editor";
 import Drag from "../../DragFile";
-import getFileName from "../../getFileName"
+import getFileName from "../../Media/getFileName"
 
 import {
 	useNavigate, useParams

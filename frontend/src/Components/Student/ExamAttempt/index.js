@@ -1,6 +1,7 @@
 import React from "react";
 import Question from "./Question"
 import AttemptSummary from "./AttemptSummary"
+import {toggleFullScreen} from "./toggleFullScreen"
 import {
   useQuery, gql
 } from "@apollo/client"
@@ -51,6 +52,7 @@ function ExamAttempt(){
   }, [leftTime])
 
   React.useEffect(() => {
+    toggleFullScreen()
     window.addEventListener("beforeunload", (event) => {
       event.preventDefault()
       return "Are you sure you want to finish this exam?"

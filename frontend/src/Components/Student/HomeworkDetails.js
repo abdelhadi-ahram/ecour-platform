@@ -1,7 +1,7 @@
 import React from "react";
 import HomeworkAnswer from "./HomeworkAnswer"
 import Serializer from "../Editor/Serializer";
-import getFileName from "../getFileName"
+import getFileName from "../Media/getFileName"
 
 import {
 	Link, useParams
