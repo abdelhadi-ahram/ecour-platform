@@ -117,6 +117,7 @@ function ExamAttempt(){
     }
 
     return () => {
+      toggleFullScreen()
       window.removeEventListener("beforeunload", confirmLeaving)
       window.removeEventListener('blur', onchange)
       document.removeEventListener("visibilitychange", onchange);
@@ -145,7 +146,6 @@ function ExamAttempt(){
   }
 
   function questionIsClicked(index){
-    console.log("hello world how are you doing today")
     if(examCompleted && !data?.getAttemptDetails.sequentiel){
       setExamCompleted(false)
       setSelected(index)

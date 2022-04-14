@@ -26,6 +26,7 @@ const GET_HOMEWORK_CONTENT = gql`
 		    	}
 		    }
 		    studentAnswers{
+		    	id
 		        createdAt
 		        student {
 					fullName
@@ -100,16 +101,18 @@ function HomeworkDetails(){
 				{
 					data?.getHomeworkById.studentAnswers.map((item, index)=> {
 						return (
-							<div key={index} className="w-full rounded-md bg-white dark:bg-zinc-800 flex px-2 py-1 items-center space-x-3 border dark:border-zinc-700">
-								<div>
-									<div className="rounded-lg w-9 h-9 bg-gray-400"></div>
+							<Link to={`/my/home/homework-answer/${item.id}`}>
+								<div key={index} className="w-full rounded-md bg-white dark:bg-zinc-800 flex px-2 py-1 items-center space-x-3 border dark:border-zinc-700">
+									<div>
+										<div className="rounded-lg w-9 h-9 bg-gray-400"></div>
+									</div>
+									<div className="w-full text-gray-800 dark:text-gray-200">{item.student.fullName}</div>	
+									<div className="w-full text-center text-gray-800 dark:text-gray-200">{item.student.email}</div>
+									<div className="w-full flex items-center justify-center text-gray-600 dark:text-gray-400">
+										{item.createdAt}
+									</div>		
 								</div>
-								<div className="w-full text-gray-800 dark:text-gray-200">{item.student.fullName}</div>	
-								<div className="w-full text-center text-gray-800 dark:text-gray-200">{item.student.email}</div>
-								<div className="w-full flex items-center justify-center text-gray-600 dark:text-gray-400">
-									{item.createdAt}
-								</div>		
-							</div>)
+							</Link>)
 					})
 				}
 				</div>

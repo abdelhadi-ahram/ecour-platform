@@ -26,7 +26,7 @@ export default function Student() {
          <div className="w-full h-screen">
 
             <Routes>
-              <Route path="/" element={<RightPanel ><Dashboard /></RightPanel >} />
+              <Route path="/home" element={<RightPanel ><Dashboard /></RightPanel >} />
               <Route path="/element/:elementId" element={<RightPanel ><ElementDetails /></RightPanel >} />
               <Route path="/lecture/:lectureId" element={<RightPanel ><LectureDetails /></RightPanel >} />
               <Route path="/homework/:homeworkId" element={<RightPanel ><HomeworkDetails /></RightPanel >} />

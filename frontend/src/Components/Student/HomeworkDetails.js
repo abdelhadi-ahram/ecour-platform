@@ -20,6 +20,7 @@ const GET_HOMEWORK_CONTENT = gql`
 		    content
 		    isOpen
 		    deadline
+		    file
 		    section {
 		    	element{
 		    		id

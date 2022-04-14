@@ -10,7 +10,7 @@ import math
 from student.models import HomeworkFinished, LectureFinished, ElementLog, ExamFinished
 from exam.models import QuestionType, Question, Choice, Exam
 from authentication.hash import Hasher
-from authentication.user_queries import require_auth
+from authentication.user_queries import require_auth, require_student
 
 class CustomStudentType(DjangoObjectType):
 	class Meta:
@@ -90,6 +90,15 @@ class HomeworkType(DjangoObjectType):
 		model = Homework 
 		fields = "__all__"
 
+	answer = graphene.Field(HomeworkAnswerType)
+	is_open = graphene.Boolean()
+	def resolve_is_open(self, info):
+		return self.is_open()
+
+	deadline = graphene.String()
+	def resolve_deadline(self, info):
+		return self.deadline.strftime("%Y-%m-%d at %H:%M")
+
 	deadline_date = graphene.String()
 	def resolve_deadline_date(self, info):
 		return self.deadline.strftime("%Y-%m-%d")
@@ -114,6 +123,14 @@ class HomeworkType(DjangoObjectType):
 			return False
 		except :
 			return False
+
+	@require_student
+	def resolve_answer(self, info):
+		student = info.context.user.student
+		try:
+			return StudentHomeworkAnswer.objects.get(homework=self, student=student)
+		except :
+			return None
 
 
 class SectionType(DjangoObjectType):

@@ -97,11 +97,11 @@ function Lecture({item, type}){
 	}
 
 	return(
-		<div className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 dark:hover:bg-zinc-700 cursor-pointer">
+		<div className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 dark:hover:bg-zinc-700 rounded cursor-pointer">
 			<div onClick={() => {}}  className="flex space-x-2 ">
 				<span className="text-gray-400">{getType(item.type || type)}</span>
 				<Link to={`/my/${type || "lecture"}/${item.id}`}>
-					<p className="text-gray-600 dark:text-gray-400">{item.title}</p>
+					<p className="text-gray-600 dark:text-gray-200">{item.title}</p>
 				</Link>
 			</div>
             <div onClick={toggle} className={`${item.isFinished ? "text-green-500" : "text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"} ${loading ? "animate-spin" : ""}`}>
@@ -116,7 +116,7 @@ function Section({section}){
 	return(
 		<div className="space-y-2 rounded">
 			<div>
-				<p className="text-gray-900 dark:text-gray-200 font-semibold text-md">{section.name}</p>
+				<p className="text-gray-900 dark:text-gray-400 font-semibold text-md">{section.name}</p>
 			</div>
 			<div className="flex flex-col space-y-2">
 				{section.lectures.map((item, index) => {
@@ -157,7 +157,7 @@ export default function Courses(){
 		<div className="flex flex-col space-y-3">
 			<div className="w-full rounded-xl py-2 px-4 bg-white dark:bg-zinc-800">
 				<div className="flex items-center space-x-2">
-					<Link to={`/my`}>
+					<Link to={`/my/home`}>
 						<p className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 ">Home</p>
 					</Link> 
 					<span className="dark:text-gray-400">/</span>

@@ -39,6 +39,8 @@ function HomeworkAnswer({homeworkId}){
 		addHomeworkAnswer({variables: {homeworkId, content, file}})
 	}
 
+	function resetValue(){}
+
 	return(
 		<div className="w-full bg-white dark:bg-zinc-800 rounded-xl px-3 py-2 rounded-md shadow p-1 border border-gray-300 dark:border-zinc-600">
 			<div className="flex flex-col space-y-2 p-2">
@@ -62,7 +64,7 @@ function HomeworkAnswer({homeworkId}){
 							</div>)
 						}
 
-						<Editor height="150px" value={input} setValue={setInput} />
+						<Editor resetValue={(fun) => resetValue = fun} height="150px" value={input} setValue={setInput} />
 					</DragFile>
 				</div>
 

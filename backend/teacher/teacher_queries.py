@@ -9,7 +9,7 @@ import json
 from student.models import HomeworkFinished, LectureFinished, ElementLog, ExamFinished
 from exam.models import QuestionType, Question, Choice, Exam, StudentAttempt, StudentQuestionAnswer
 from authentication.hash import Hasher
-from authentication.user_queries import require_auth, require_teacher
+from authentication.user_queries import require_auth, require_teacher, require_student
 import math
 
 from department.types import (
@@ -56,6 +56,7 @@ class TeacherQueries(graphene.ObjectType):
 
 	get_lecture_by_id = graphene.Field(LectureType, lecture_id=graphene.ID())
 	get_homework_by_id = graphene.Field(HomeworkType, homework_id=graphene.ID())
+	get_homework_answer = graphene.Field(HomeworkAnswerType, homework_answer_id=graphene.ID())
 
 	get_question_types = graphene.List(QuestionTypeType)
 
@@ -135,6 +136,14 @@ class TeacherQueries(graphene.ObjectType):
 				raise GraphQLError(makeJson("PERMISSION", "You can not perform this operation"))
 		else :
 			raise GraphQLError(makeJson("LOGIN", "You are not logged in"))
+
+	@require_teacher
+	def resolve_get_homework_answer(self, info, homework_answer_id):
+		try:
+			homework_answer = StudentHomeworkAnswer.objects.get(id=homework_answer_id)
+			return homework_answer
+		except:
+			raise GraphQLError(makeJson("DATAERROR", "The provided data is not valid"))
 
 	def resolve_get_question_types(self, info):
 		return QuestionType.objects.all()
