@@ -23,6 +23,7 @@ function DeleteDialog({onCancel, onDelete}){
       <div className="fixed inset-0 bg-black opacity-20 dark:opacity-40 z-40"></div>
       <div className="fixed inset-0 bg-transparent z-50 relative flex flex-col items-center">
         <Transition
+          appear="true"
           show={isShown}
           enter="transition ease-in-out duration-300 transform"
           enterFrom="-translate-y-full"

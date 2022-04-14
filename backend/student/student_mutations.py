@@ -17,9 +17,10 @@ from graphql import GraphQLError
 from .student_queries import makeJson
 
 from authentication.hash import Hasher
-from authentication.user_queries import require_auth
+from authentication.user_queries import require_auth, require_student
 
 import json
+import datetime
 
 class AddHomeworkAnswer(graphene.Mutation):
 	class Arguments:
@@ -156,7 +157,7 @@ class SaveStudentAnswer(graphene.Mutation):
 		content = graphene.String() 
 
 	ok = graphene.Boolean()
-	next_question = graphene.String()
+	# next_question = graphene.String()
 
 	@require_auth
 	def mutate(self, info, attempt_id, question_id, content):
@@ -171,7 +172,7 @@ class SaveStudentAnswer(graphene.Mutation):
 
 				# check if the user has not already answered this question before 
 				# if it is a sequentiel exam
-				if not StudentQuestionAnswer.objects.filter(attempt=attempt, question=question).exists():
+				if not StudentQuestionAnswer.objects.filter(attempt=attempt, question=question).exists() :
 					student_question = StudentQuestionAnswer(attempt=attempt, question=question)
 					student_question.save()
 					# if the type of the exam is not plain text 
@@ -180,23 +181,84 @@ class SaveStudentAnswer(graphene.Mutation):
 						answers = json.loads(content)
 						# if the question is a single question then we must make sure that we only store on choice
 						if question.type.type != "Single choice" and len(answers) > 1:
-							return SaveStudentAnswer(ok=False, next_question="You must provide one choice at most")
+							return SaveStudentAnswer(ok=True)
 						for answer in answers:
 							decoded_choice_id = Hasher.decode(user.cin, answer)
 							choice = Choice.objects.get(pk=decoded_choice_id)
 							spc = StudentPickedChoice(student_question=student_question, choice=choice)
 							spc.save()
-						return SaveStudentAnswer(ok=True, next_question="Answer has been created successfully")
+						return SaveStudentAnswer(ok=True)
 					# if the question type is plain text then we will add the content to the question
 					else:
 						student_question.content = content
 						student_question.save()
-						return SaveStudentAnswer(ok=True, next_question="the question saved with value f{content}")
+						return SaveStudentAnswer(ok=True)
 
-				return SaveStudentAnswer(ok=False, next_question="The question answer is already exists")
+				else :
+					if attempt.exam.sequentiel:
+						raise GraphQLError(makeJson("PERMISSION", "You do not have the right to perform this avtion"))
+					student_question = StudentQuestionAnswer.objects.get(attempt=attempt, question=question)
+					if question.type.type != "Plain text":
+						answers = json.loads(content)
+						# if the question is a single question then we must make sure that we only store on choice
+						if question.type.type != "Single choice" and len(answers) > 1:
+							return SaveStudentAnswer(ok=False)
+						# delete picked question if exists
+						if(len(answers) > 0):
+							StudentPickedChoice.objects.get(student_question=student_question).delete()
+						for answer in answers:
+							decoded_choice_id = Hasher.decode(user.cin, answer)
+							choice = Choice.objects.get(pk=decoded_choice_id)
+							spc = StudentPickedChoice(student_question=student_question, choice=choice)
+							spc.save()
+						return SaveStudentAnswer(ok=True)
+					# if the question type is plain text then we will add the content to the question
+					elif content:
+						student_question.content = content
+						student_question.save()
+						return SaveStudentAnswer(ok=True)
+				return SaveStudentAnswer(ok=False)
+
 			except StudentAttempt.DoesNotExist:
 				raise GraphQLError("Student attempt does not exists")
 			except Exception as e:
 				# raise GraphQLError(makeJson("DATAERROR", "The provided data is not valid"))
 				raise GraphQLError(e)
 		raise GraphQLError(makeJson("PERMISSION", "You do not have the permission to perform this action"))
+
+
+class ReportExam(graphene.Mutation):
+	class Arguments:
+		attempt_id = graphene.ID() 
+
+	ok = graphene.ID()
+
+	@require_student
+	def mutate(self, info, attempt_id):
+		decoded_attempt_id = Hasher.decode(info.context.user.cin, attempt_id)
+		try:
+			attempt = StudentAttempt.objects.get(id=decoded_attempt_id)
+			attempt.is_reported = True 
+			attempt.finsished_at = datetime.datetime.now()
+			attempt.save()
+			return ReportExam(ok=True)
+		except:
+			return ReportExam(ok=False)
+
+class FinishExam(graphene.Mutation):
+	class Arguments:
+		attempt_id = graphene.ID() 
+
+	ok = graphene.ID()
+
+	@require_student
+	def mutate(self, info, attempt_id):
+		decoded_attempt_id = Hasher.decode(info.context.user.cin, attempt_id)
+		try:
+			attempt = StudentAttempt.objects.get(id=decoded_attempt_id)
+			attempt.is_reported = False 
+			attempt.finsished_at = datetime.datetime.now()
+			attempt.save()
+			return FinishExam(ok=True)
+		except:
+			return FinishExam(ok=False)

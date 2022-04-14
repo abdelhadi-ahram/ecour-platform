@@ -73,3 +73,14 @@ def require_teacher(fun):
 
     return inner
 
+
+def require_student(fun):
+    def inner(obj, info, **kwargs):
+        user = info.context.user
+        if user.is_authenticated:
+            if user.is_student():
+                return fun(obj, info, **kwargs)
+        raise GraphQLError(makeJson("PERMISSION", "Only Student are allowed to perform this action"))
+
+    return inner
+

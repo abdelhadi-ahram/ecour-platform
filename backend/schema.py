@@ -21,7 +21,15 @@ from teacher.teacher_mutations import (
 from authentication.user_queries import UserQuery
 from teacher.teacher_queries import TeacherQueries
 from student.student_queries import StudentQueries
-from student.student_mutations import AddHomeworkAnswer, ToggleLectureFinished, CreateAttempt, SaveStudentAnswer
+from student.student_mutations import (
+    AddHomeworkAnswer, 
+    ToggleLectureFinished, 
+    CreateAttempt, 
+    SaveStudentAnswer, 
+    ReportExam,
+    FinishExam
+)
+
 from exam.exam_queries import StudentExamQueries
 
 class Query(StudentExamQueries, TeacherQueries, UserQuery, StudentQueries, graphene.ObjectType):
@@ -46,5 +54,7 @@ class Mutations(graphene.ObjectType):
     save_student_answer = SaveStudentAnswer.Field()
     verify_answer = VerifyAnswer.Field()
     verify_attempt = VerifyAttempt.Field()
+    report_exam = ReportExam.Field()
+    finish_exam = FinishExam.Field()
 
 schema = graphene.Schema(query=Query, mutation=Mutations)

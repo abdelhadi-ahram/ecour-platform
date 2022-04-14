@@ -1,6 +1,7 @@
 import React from 'react';
 import UserProvider from "../UserProvider"
 import {showSidebar} from "./Sidebar"
+import Search from "./Dialog/Search"
 
 export default function TopBar(props){
   const firstName = React.useContext(UserProvider)
@@ -25,7 +26,7 @@ export default function TopBar(props){
     <div className="w-full px-2">
         <div className="py-1 flex items-center justify-between">
             <p className="text-gray-800 dark:text-gray-200 font-semibold text-lg md:text-2xl">Welcome, {firstName}</p>
-              <div className="flex items-center space-x-4 rounded-lg bg-white dark:bg-zinc-800 py-2 px-4">
+              <div className="flex items-center space-x-4 rounded-lg bg-white dark:bg-zinc-800 py-2 px-4 shadow">
                 <div className={`${darkTheme ? "text-blue-500" : "text-gray-500 dark:text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"}`} onClick={changeTheme}>
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
                 </div>

@@ -40,7 +40,7 @@ function StudentAttempts(){
 		<div className="flex flex-col space-y-3">
 			<div className="w-full rounded-xl py-2 px-4 bg-white dark:bg-zinc-800">
 				<div className="flex items-center space-x-2">
-					<Link to={`/my/element/${data?.getExamById.section.element.id}`}>
+					<Link to={`/my/home/element/${data?.getExamById.section.element.id}`}>
 						<p className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 ">{data?.getExamById.section.element.name}</p>
 					</Link> 
 					<span className="dark:text-gray-400">/</span>
@@ -56,7 +56,7 @@ function StudentAttempts(){
 				{
 					data?.getExamById.studentAttempts.map((attempt, index) => {
 						return (
-							<Link to={`/my/correct-attempt/${attempt.id}`}>
+							<Link to={`/my/home/correct-attempt/${attempt.id}`}>
 							<div key={index} className="cursor-pointer group border dark:border-zinc-700 p-1 px-3 rounded-lg flex items-center justify-between dark:hover:bg-zinc-700">
 								<div className="dark:text-gray-300 flex item-center space-x-3">
 									<div>

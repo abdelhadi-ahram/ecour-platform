@@ -36,7 +36,7 @@ function AddLectureFile(){
 
 
   function cancelClicked(){
-    navigate("/my")
+    navigate("/my/home")
   }
 
   function getDragState(state){
@@ -56,7 +56,7 @@ function AddLectureFile(){
   function postData(){
     if(title && file){
       addLectureFile({variables : {title, file, sectionId}})
-      navigate("/my")
+      navigate("/my/home")
     }
   }
 

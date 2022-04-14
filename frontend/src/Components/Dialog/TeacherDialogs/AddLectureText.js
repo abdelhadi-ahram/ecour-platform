@@ -32,13 +32,13 @@ function AddLectureText(){
     })
 
   function cancelClicked(){
-    navigate("/my")
+    navigate("/my/home")
   }
 
   function postData(){
     var content = JSON.stringify(input)
     addLecture({variables : {title, content, sectionId}})
-    navigate("/my")
+    navigate("/my/home")
   }
 
   function resetValue(){}

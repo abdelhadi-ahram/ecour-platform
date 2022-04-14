@@ -5,7 +5,7 @@ import Teacher from './Components/Teacher';
 import Student from './Components/Student';
 import LandingPage from './Components/LandingPage'
 
-//https://dribbble.com/shots/17399694-Search-Results-Animationhttps://dribbble.com/shots/17399694-Search-Results-Animation
+//https://dribbble.com/shots/17399694-Search-Results-Animation
 
 import './index.css';
 
@@ -36,7 +36,7 @@ function AlreadyLoggedin(props){
   const {data, error} = useQuery(GET_LOGGED_USER)
 
   if(data){
-    return <Navigate to="/my" replace />
+    return <Navigate to="/my/home" replace />
   }
 
   if(error) return props.children

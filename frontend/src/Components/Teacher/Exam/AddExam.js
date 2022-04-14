@@ -67,7 +67,7 @@ function AddExam(){
 			sectionId, title, duration, sequentiel, attempts, startsAt, description
 		}}).then((res) => {
 			if(res.data.addExam.id){
-				navigate(`/my/edit-exam/${res.data.addExam.id}`)
+				navigate(`/my/home/edit-exam/${res.data.addExam.id}`)
 			}
 		})
 		.catch(err => {

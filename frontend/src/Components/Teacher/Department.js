@@ -2,7 +2,7 @@ import React from "react";
 import Section from "./Section";
 import {AddLecture} from "../Dialog/TeacherDialogs"
 import {LoadingCard} from "../Loadings"
-
+import {selectButton} from "../Sidebar.js"
 
 import {
   useQuery,
@@ -95,6 +95,10 @@ function Departments(){
     }
   }, [data])
 
+  React.useEffect(() => {
+    selectButton("Home")
+  }, [])
+
   if (error) {return <b className="text-red-500">Error occurred</b>}
 
 	return(
@@ -114,7 +118,7 @@ function Departments(){
 
   			<div className="w-full bg-white dark:bg-zinc-800 rounded-lg px-3 py-2">
   				<div className="flex items-center justify-end">
-  					<Link to="/my/select-section">
+  					<Link to="/my/home/select-section">
               <button className="add-btn">+ Add</button>
             </Link>
           </div>

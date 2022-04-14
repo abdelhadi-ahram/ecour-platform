@@ -55,7 +55,7 @@ function UpdateLectureFile({onCancel}){
     if(onCancel){
       onCancel(false)
     } else {
-      navigate("/my")
+      navigate("/my/home")
     }
   }
 

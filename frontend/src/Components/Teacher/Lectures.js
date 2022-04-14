@@ -50,9 +50,9 @@ function Lectures({lectures}){
 
   function updateLecture(id, type){
     if(type == "text"){
-      return navigate("/my/update-lecture-text/" + id)
+      return navigate("/my/home/update-lecture-text/" + id)
     }
-    navigate("/my/update-lecture-file/" + id)
+    navigate("/my/home/update-lecture-file/" + id)
   }
 
   function Notify(){
@@ -76,7 +76,7 @@ function Lectures({lectures}){
             <div key={index} className="flex justify-between px-3 py-2 hover:bg-gray-50 dark:hover:bg-zinc-700 rounded">
               <div className="flex space-x-2">
                 <span className="text-gray-400">{getType(lecture.type)}</span>
-                <Link to={`/my/lecture-details/${lecture.id}`}><p className="text-gray-700 dark:text-gray-300">{lecture.title}</p></Link>
+                <Link to={`/my/home/lecture-details/${lecture.id}`}><p className="text-gray-700 dark:text-gray-300">{lecture.title}</p></Link>
               </div>
               <div className="flex space-x-3">
                 <span className="text-red-400 hover:text-red-500" onClick={() => {deleteLecture(lecture.id)}}>

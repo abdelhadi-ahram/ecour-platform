@@ -1,10 +1,9 @@
 import React from 'react';
 import Sidebar from '../Sidebar';
 import RightPanel from '../RightPannel';
-import Dashboard from './Dashboard';
 import {buttons} from './teacherButtons';
 import Department from './Department';
-import Students from "./Students"
+import StudentManagment from "./Students"
 import LectureDetails from "./LectureDetails"
 import HomeworkDetails from "./HomeworkDetails"
 import AddExam from './Exam/AddExam'
@@ -24,16 +23,16 @@ export default function Teacher() {
 
   <div className="w-full h-screen">
       <Routes>
-        <Route path="/*" element={<RightPanel><Department /></RightPanel>} />
-        <Route path="/students" element={<RightPanel><Students /></RightPanel>} />
-        <Route path="/manage-department" element={<RightPanel><b>Hello world</b></RightPanel>} />
-        <Route path="/lecture-details/:lectureId" element={<RightPanel><LectureDetails /></RightPanel>} />
-        <Route path="/homework-details/:homeworkId" element={<RightPanel><HomeworkDetails /></RightPanel>} />
-        <Route path="/add-exam/:sectionId" element={<RightPanel><AddExam /></RightPanel>} />
-        <Route path="/edit-exam/:examId" element={<RightPanel withoutCalendar><EditExam /></RightPanel>} />
-        <Route path="/exam-details/:examId" element={<RightPanel><ExamDetails /></RightPanel>} />
-        <Route path="/exam-results/:examId" element={<RightPanel><StudentAttempts /></RightPanel>} />
-        <Route path="/correct-attempt/:attemptId" element={<RightPanel withoutCalendar><CorrectAttempt /></RightPanel>} />
+        <Route path="/home/*" element={<RightPanel><Department /></RightPanel>} />
+        <Route path="/students" element={<RightPanel><StudentManagment /></RightPanel>} />
+        <Route path="/home/manage-department" element={<RightPanel><b>Hello world</b></RightPanel>} />
+        <Route path="/home/lecture-details/:lectureId" element={<RightPanel><LectureDetails /></RightPanel>} />
+        <Route path="/home/homework-details/:homeworkId" element={<RightPanel><HomeworkDetails /></RightPanel>} />
+        <Route path="/home/add-exam/:sectionId" element={<RightPanel><AddExam /></RightPanel>} />
+        <Route path="/home/edit-exam/:examId" element={<RightPanel withoutCalendar><EditExam /></RightPanel>} />
+        <Route path="/home/exam-details/:examId" element={<RightPanel><ExamDetails /></RightPanel>} />
+        <Route path="/home/exam-results/:examId" element={<RightPanel><StudentAttempts /></RightPanel>} />
+        <Route path="/home/correct-attempt/:attemptId" element={<RightPanel withoutCalendar><CorrectAttempt /></RightPanel>} />
       </Routes>
   </div>
 

@@ -59,7 +59,7 @@ function UpdateHomework({onCancel, homework}){
 		if(onCancel){
 			onCancel(false)
 		} else {
-			navigate("/my")
+			navigate("/my/home")
 		}
 	}
 

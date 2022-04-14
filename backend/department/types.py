@@ -31,11 +31,12 @@ class CustomStudentType(DjangoObjectType):
 		return encoded_id
 
 class TeachingType(DjangoObjectType):
-    class Meta:
-        model = Teaching
-        fields = ("id", "department")
+	class Meta:
+		model = Teaching
+		fields = ("id", "department")
 
-    # is_responsible = graphene.String()
+
+# is_responsible = graphene.String()
 class DepartmentType(DjangoObjectType):
 	class Meta:
 		model = Department

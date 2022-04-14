@@ -37,7 +37,7 @@ function AddHomework(){
 	})
 
 	function cancelClicked(){
-		navigate("/my")
+		navigate("/my/home")
 	}
 
 	function onDrop(files){
@@ -55,7 +55,7 @@ function AddHomework(){
 			title, deadline, sectionId, content, file
 		}})
 
-		navigate("/my")
+		navigate("/my/home")
 	}
 
 	function resetValue(){}

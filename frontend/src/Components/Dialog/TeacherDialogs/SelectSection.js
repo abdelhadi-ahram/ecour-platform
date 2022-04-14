@@ -42,7 +42,7 @@ function SelectSection(){
   const navigate = useNavigate()
 
   function cancelClicked(){
-    navigate("/my")
+    navigate("/my/home")
   }
 
   function addSection(e){
@@ -51,7 +51,7 @@ function SelectSection(){
       const name = e.target.value
       addNewSction({variables : {teachingId, name}})
       .then((res) => {
-        navigate(`/my/select-type/${res.data.addSection.sectionId}`)
+        navigate(`/my/home/select-type/${res.data.addSection.sectionId}`)
       }, (err) => {
         console.log(err)
       })
@@ -74,7 +74,7 @@ function SelectSection(){
           {
             data?.getElementLectures?.sections?.map((section, index) => {
               return (
-                <Link key={index} to={`/my/select-type/${section.id}`}>
+                <Link key={index} to={`/my/home/select-type/${section.id}`}>
                   <div className="text-gray-600 dark:text-gray-300 w-full rounded-md p-2 hover:bg-gray-100 dark:hover:bg-zinc-700 hover:text-gray-800 dark:hover:text-gray-200">{section.name}</div>
                 </Link>
               )

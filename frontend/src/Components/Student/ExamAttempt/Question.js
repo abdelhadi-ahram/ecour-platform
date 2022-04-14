@@ -19,6 +19,7 @@ const GET_QUESTION_CONTENT = gql`
 query GetQuestionContent($attemptId: ID!, $questionId: ID!){
 	getQuestionContent(attemptId: $attemptId, questionId: $questionId){
 		estimatedTime
+		alreadyAnswered
 		mark
 		content
 		type {
@@ -37,7 +38,6 @@ const SAVE_QUESTION = gql`
 	mutation SaveStudentAnswer($attemptId: ID!, $questionId: ID!, $content: String!){
 		saveStudentAnswer(attemptId: $attemptId, questionId: $questionId, content: $content){
 			ok 
-			nextQuestion
 		}
 	}
 `;
@@ -49,7 +49,7 @@ const generateChoicesForm = (type) => {
 }
 
 
-function Question({question, fetchNext, index, isLast, setExamFinished}){
+function Question({question, fetchNext, index, isLast, setExamCompleted}){
 	const [questionId, setQuestionId] = React.useState(question)
 	const {attemptId} = useParams()
 	const [selectedChoices, setSelectedChoices] = React.useState(0)
@@ -58,7 +58,7 @@ function Question({question, fetchNext, index, isLast, setExamFinished}){
 
 	const [saveQuestionAnswer, saveQuestionResponse] = useMutation(SAVE_QUESTION)
 
-	const {data, error, loading} = useQuery(GET_QUESTION_CONTENT, {
+	const {data, error, loading, refetch} = useQuery(GET_QUESTION_CONTENT, {
 		variables : {questionId, attemptId},
 		fetchPolicy: "network-only"
 	})
@@ -79,7 +79,8 @@ function Question({question, fetchNext, index, isLast, setExamFinished}){
 	}
 
 	function resetQuestion(){
-		setContent(initialValue)
+		resetValue()
+		refetch()
 	}
 
 	function saveQuestion(){
@@ -95,18 +96,18 @@ function Question({question, fetchNext, index, isLast, setExamFinished}){
 		}
 		saveQuestionAnswer({variables : answer})
 		.then((data) => {
-			if(isLast) setExamFinished(true)
+			if(isLast) setExamCompleted(true)
 			else fetchNext()
 		}, (err) => {
-			console.log(err)
+			console.log(err.message)
 		})
 	}
 
 	return(
 		<div className="flex flex-col space-y-3 py-1 px-2 flex-1 overflow-y-auto">
-			<QuestionInfo index={index} resetQuestion={resetQuestion} mark={data?.getQuestionContent.mark} estimatedTime={data?.getQuestionContent.estimatedTime} />
+			<QuestionInfo saved={data?.getQuestionContent.alreadyAnswered} index={index} resetQuestion={resetQuestion} mark={data?.getQuestionContent.mark} estimatedTime={data?.getQuestionContent.estimatedTime} />
 			<div className="flex flex-col p-2 flex-1 overflow-y-auto">
-				<div className="py-6 text-gray-100 text-lg select-none">
+				<div className="py-6 text-gray-100 text-xl select-none">
 					{Serializer(JSON.parse(data?.getQuestionContent.content || "[]")) }
 				</div>
 				{

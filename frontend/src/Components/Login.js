@@ -36,15 +36,14 @@ export default function Login() {
       setDataError("Pleaze fill the missing informations")
   }
 
-  if(error){
-    console.log("error")
-  }
+  React.useEffect(() => {
+    setDataError(error?.message)
+  }, [error])
 
   React.useEffect(() => {
-    console.log(data)
     if(data){
-      if(data.authenticateUser.is_authenticated)
-        navigate("/my")
+      if(data.authenticateUser?.is_authenticated)
+        navigate("/my/home")
     }
   }, [data])
 
@@ -53,12 +52,7 @@ export default function Login() {
       <div className="w-[92%] sm:w-[400px]">
         <div className="bg-white dark:bg-zinc-800 shadow-md rounded-2xl px-11 py-14">
         {
-          /*if the user left the inputs empty*/
-          dataError && <p className="text-red-500 bg-red-50 dark:bg-red-500 p-[10px] mb-3 rounded">Pleaze fill the missing informations</p>
-        }
-        {
-          /*if an error occurred from the server*/
-          error && <p className="text-red-500 bg-red-50 dark:bg-transparent dark:text-red-400 dark:border dark:border-red-400 px-3 py-2 mb-4 rounded-lg">{error.message}</p>
+          dataError && <p className="text-red-500 bg-red-50 dark:bg-transparent dark:text-red-400 dark:border dark:border-red-400 px-3 py-2 mb-4 rounded-lg">{dataError}</p>
         }
           <div className="mb-4">
             <label className="block text-gray-700 dark:text-gray-200 text-sm font-bold mb-2">
@@ -73,7 +67,7 @@ export default function Login() {
             <label className="block text-gray-700 dark:text-gray-200 text-sm font-bold mb-2" >
               Password
             </label>
-            <div className="flex items-center  appearance-none border border-gray-300 border-zinc-700 rounded w-full py-2 px-3 text-gray-700 text-gray-200 hover:border-gray-400 dark:hover:border-zinc-600">
+            <div className="flex items-center  appearance-none border border-gray-300 dark:border-zinc-700 rounded w-full py-2 px-3 text-gray-700 text-gray-200 hover:border-gray-400 dark:hover:border-zinc-600">
                   <input autoComplete="off" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full bg-transparent focus:outline-none focus:shadow-outline" id="password" type={showPassword ? "text" : "password"} placeholder="**********" />
                   <span className="text-gray-500 dark:text-gray-400" onClick={() => {setShowPassword(!showPassword)}} >
                   {showPassword ? (

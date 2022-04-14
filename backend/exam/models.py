@@ -73,6 +73,7 @@ class StudentAttempt(models.Model):
 	mark = models.FloatField(null=True)
 	is_open = models.BooleanField(default=False)
 	is_verified = models.BooleanField(default=False)
+	is_reported = models.BooleanField(default=False)
 	class Meta:
 		db_table = "student_attempt"
 

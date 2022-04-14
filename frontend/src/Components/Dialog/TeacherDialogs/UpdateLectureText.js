@@ -52,7 +52,7 @@ function UpdateLectureText({onCancel}){
     if(onCancel){
       onCancel(false)
     } else {
-      navigate("/my")
+      navigate("/my/home")
     }
   }
 

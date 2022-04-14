@@ -17,7 +17,7 @@ from graphql import GraphQLError
 import json
 from django.utils import timezone
 from django.db.models import Sum
-from authentication.user_queries import require_auth, require_teacher
+from authentication.user_queries import require_auth, require_teacher, require_student
 
 from authentication.hash import Hasher
 from random import shuffle
@@ -112,6 +112,11 @@ class AttemptType(DjangoObjectType):
 	id = graphene.ID()
 	student_answers = graphene.List(StudentQuestionAnswerType)
 	total_marks = graphene.Float()
+	is_reported = graphene.Boolean()
+
+	@require_auth
+	def resolve_is_reported(self, info):
+		return self.is_reported
 
 	@require_auth
 	def resolve_total_marks(self, info):
@@ -169,6 +174,7 @@ class QuestionModelType(DjangoObjectType):
 	content = graphene.String()
 	choices = graphene.List(ChoiceType)
 	type = graphene.Field(QuestionTypeType)
+	already_answered = graphene.Boolean()
 
 	def resolve_estimated_time(self, info):
 		marks = Question.objects.filter(exam=self.exam).aggregate(Sum("mark"))
@@ -182,6 +188,9 @@ class QuestionModelType(DjangoObjectType):
 		return encoded_id
 	def resolve_type(self, info):
 		return self.type
+	@require_student
+	def resolve_already_answered(self, info):
+		return StudentQuestionAnswer.objects.filter(question=self).exists()
 
 
 class ExamType(DjangoObjectType):
@@ -200,6 +209,7 @@ class ExamType(DjangoObjectType):
 	is_finished = graphene.Boolean()
 	student_attempts_count = graphene.Int()
 
+	# For teachers 
 	students_attempts = graphene.List(AttemptType)
 	
 	def resolve_duration(self, info):
@@ -212,16 +222,15 @@ class ExamType(DjangoObjectType):
 	def resolve_id(self, info):
 		id = Hasher.encode("exam", self.id)
 		return id
-	@require_auth
+
+	@require_student
 	def resolve_is_open(self, info):
-		if info.context.user.is_student():
-			try:
-				student = info.context.user.student
-				if StudentAttempt.objects.filter(student=student, exam=self).count() < self.attempts:
-					return self.is_open()
-			except:
-				return False
-		return False
+		try:
+			student = info.context.user.student
+			if StudentAttempt.objects.filter(student=student, exam=self).count() < self.attempts:
+				return self.is_open()
+		except:
+			return False
 
 	def resolve_message(self, info):
 		now = timezone.now()
@@ -252,27 +261,22 @@ class ExamType(DjangoObjectType):
 		else :
 			return False
 
-	@require_auth
+	@require_student
 	def resolve_student_attempts_count(self, info):
-		user = info.context.user 
-		if user.is_student():
-			try:
-				return StudentAttempt.objects.filter(exam=self, student=user.student).count()
-			except Exception as e:
-				raise GraphQLError(e)
-		else:
-			return 0
+		student = info.context.user.student
+		try:
+			return StudentAttempt.objects.filter(exam=self, student=student).count()
+		except Exception as e:
+			raise GraphQLError(e)
 
-	@require_auth
+
+	@require_student
 	def resolve_attempts(self, info):
-		user = info.context.user 
-		if user.is_student():
-			try:
-				return StudentAttempt.objects.filter(student=user.student, exam=self)
-			except :
-				return []
-		else :
-			return None
+		student = info.context.user.student
+		try:
+			return StudentAttempt.objects.filter(student=student, exam=self)
+		except :
+			return []
 
 	@require_teacher
 	def resolve_students_attempts(self, info):

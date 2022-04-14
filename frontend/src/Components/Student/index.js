@@ -19,7 +19,7 @@ import {
 export default function Student() {
 
   return(
-    <div className="w-screen h-screen bg-[#f5f6f8] dark:bg-zinc-900 font-nunito flex">
+    <div className="w-screen h-screen bg-gray-100 dark:bg-zinc-900 font-nunito flex">
         
         <Sidebar buttons={buttons} />
         

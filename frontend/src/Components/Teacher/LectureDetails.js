@@ -65,7 +65,7 @@ function LectureDetails(){
 		<div className="flex flex-col space-y-3">
 			<div className="w-full rounded-xl py-2 px-4 bg-white dark:bg-zinc-800">
 				<div className="flex items-center space-x-2">
-					<Link to={`/my`}>
+					<Link to={`/my/home`}>
 						<p className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">{data?.getLectureById.section.element.name}</p>
 					</Link> 
 					<span className="dark:text-gray-300">/</span>
